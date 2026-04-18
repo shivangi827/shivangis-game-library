@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Never Have I Ever</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="floating-bg" aria-hidden="true">
+    <span class="floater" style="left:3%;animation-duration:19s;animation-delay:0s;font-size:1.8rem">♥</span>
+    <span class="floater" style="left:10%;animation-duration:24s;animation-delay:2s;font-size:1.4rem">♡</span>
+    <span class="floater" style="left:18%;animation-duration:17s;animation-delay:5s;font-size:2rem">♥</span>
+    <span class="floater" style="left:25%;animation-duration:21s;animation-delay:1s;font-size:1.2rem">♡</span>
+    <span class="floater" style="left:33%;animation-duration:26s;animation-delay:4s;font-size:1.6rem">♥</span>
+    <span class="floater" style="left:40%;animation-duration:18s;animation-delay:7s;font-size:2.2rem">♡</span>
+    <span class="floater" style="left:48%;animation-duration:22s;animation-delay:0s;font-size:1.3rem">♥</span>
+    <span class="floater" style="left:55%;animation-duration:20s;animation-delay:3s;font-size:1.8rem">♡</span>
+    <span class="floater" style="left:62%;animation-duration:25s;animation-delay:6s;font-size:1.5rem">♥</span>
+    <span class="floater" style="left:70%;animation-duration:19s;animation-delay:2s;font-size:2rem">♡</span>
+    <span class="floater" style="left:78%;animation-duration:23s;animation-delay:5s;font-size:1.4rem">♥</span>
+    <span class="floater" style="left:85%;animation-duration:17s;animation-delay:8s;font-size:1.7rem">♡</span>
+    <span class="floater" style="left:92%;animation-duration:21s;animation-delay:1s;font-size:1.9rem">♥</span>
+  </div>
+
+  <!-- ── Home ──────────────────────────────────────── -->
+  <div id="screen-home" class="screen active">
+    <div class="card home-card">
+      <img src="images/wine.png" alt="Two cats clinking wine glasses" class="scene-img" />
+      <h1 class="title">Never Have<br/>I Ever</h1>
+      <p class="subtitle">Confess or stay innocent — who's the wildest?</p>
+
+      <button id="btn-create" class="btn btn-primary">Create Room</button>
+
+      <div class="divider"><span>or join a game</span></div>
+
+      <div class="join-row">
+        <input id="input-join-code" type="text" class="input" placeholder="Room code" maxlength="5" autocomplete="off" />
+        <button id="btn-join" class="btn btn-outline">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Name Modal ────────────────────────────────── -->
+  <div id="modal-name" class="modal-overlay hidden">
+    <div class="card modal-card">
+      <h2 id="modal-name-title" class="modal-title">Enter Your Name</h2>
+      <input id="input-name" type="text" class="input" placeholder="Your name" maxlength="20" autocomplete="off" />
+      <p id="modal-error" class="error-msg hidden"></p>
+      <button id="btn-name-confirm" class="btn btn-primary">Let's Go</button>
+    </div>
+  </div>
+
+  <!-- ── Lobby ─────────────────────────────────────── -->
+  <div id="screen-lobby" class="screen hidden">
+    <div class="card lobby-card">
+      <img src="images/coffee.png" alt="Two cats having coffee" class="scene-img scene-img-sm" />
+      <h2 class="screen-title">Waiting Room</h2>
+
+      <div class="code-box">
+        <span class="code-label">Room Code</span>
+        <span id="lobby-code" class="code-value"></span>
+        <button id="btn-copy-code" class="btn-icon" title="Copy code">Copy</button>
+      </div>
+
+      <p class="lobby-meta"><span id="lobby-player-count">0</span> players in the room</p>
+      <p id="lobby-waiting-msg" class="lobby-waiting hidden">Need at least 2 players to start</p>
+
+      <ul id="lobby-player-list" class="player-list"></ul>
+
+      <div id="host-settings" class="host-settings hidden">
+        <label class="setting-label">
+          Rounds
+          <select id="setting-rounds" class="select">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15" selected>15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="host-start-area" class="hidden">
+        <button id="btn-start-game" class="btn btn-primary btn-full" disabled>Start Game</button>
+      </div>
+      <div id="guest-waiting" class="guest-msg hidden">
+        <p>Waiting for host to start...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Round / Answering ─────────────────────────── -->
+  <div id="screen-round" class="screen hidden">
+    <div class="card round-card">
+      <span id="round-badge" class="badge">Round 1 / 15</span>
+      <h2 class="prompt-label">Never have I ever...</h2>
+      <p id="round-prompt" class="prompt-text"></p>
+
+      <div id="answer-buttons-row" class="answer-row">
+        <button id="btn-i-have" class="btn btn-guilty">I Have 😈</button>
+        <button id="btn-never" class="btn btn-innocent">Never 😇</button>
+      </div>
+
+      <p id="answer-submitted" class="submitted-msg hidden">Answer locked in!</p>
+      <p id="answer-status" class="answer-status">0 / 0 answered</p>
+    </div>
+  </div>
+
+  <!-- ── Reveal ────────────────────────────────────── -->
+  <div id="screen-reveal" class="screen hidden">
+    <div class="card reveal-card">
+      <span id="reveal-round-badge" class="badge">Round 1 / 15</span>
+      <p id="reveal-prompt" class="reveal-prompt"></p>
+      <p id="reveal-flavor" class="flavor-text"></p>
+
+      <div class="reveal-split">
+        <div class="reveal-col guilty-col">
+          <h3 class="col-title">Guilty 😈</h3>
+          <ul id="guilty-list" class="reveal-list"></ul>
+        </div>
+        <div class="reveal-col innocent-col">
+          <h3 class="col-title">Innocent 😇</h3>
+          <ul id="innocent-list" class="reveal-list"></ul>
+        </div>
+      </div>
+
+      <div id="reveal-host-area" class="hidden">
+        <button id="btn-next-round" class="btn btn-primary btn-full">Next Round</button>
+      </div>
+      <div id="reveal-guest-area" class="guest-msg hidden">
+        <p>Waiting for host...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Final ─────────────────────────────────────── -->
+  <div id="screen-final" class="screen hidden">
+    <div class="card final-card">
+      <img src="images/dance.png" alt="Two cats dancing" class="scene-img" />
+      <h2 class="screen-title">Game Over!</h2>
+      <p class="final-subtitle"><span id="wild-name"></span> is The Wild One!</p>
+
+      <ul id="final-scoreboard" class="scoreboard"></ul>
+
+      <div id="final-host-area" class="hidden">
+        <button id="btn-play-again" class="btn btn-primary btn-full">Play Again</button>
+      </div>
+      <div id="final-guest-area" class="guest-msg hidden">
+        <p>Waiting for host...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

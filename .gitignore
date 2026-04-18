@@ -1,0 +1,10 @@
+node_modules/
+dist/
+public/imposter/app.js
+public/imposter/app.js.map
+public/vibe-check/app.js
+public/vibe-check/app.js.map
+public/never-have-i-ever/app.js
+public/never-have-i-ever/app.js.map
+*.pdf
+.DS_Store

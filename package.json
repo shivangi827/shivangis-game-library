@@ -1,0 +1,28 @@
+{
+  "name": "shivangis-game-library",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:server": "tsc -p tsconfig.server.json",
+    "build:imposter": "esbuild src/games/imposter/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/imposter/app.js",
+    "build:vibe-check": "esbuild src/games/vibe-check/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/vibe-check/app.js",
+    "build:never-have-i-ever": "esbuild src/games/never-have-i-ever/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/never-have-i-ever/app.js",
+    "build:clients": "npm run build:imposter && npm run build:vibe-check && npm run build:never-have-i-ever",
+    "build": "npm run build:server && npm run build:clients",
+    "start": "node dist/server.js",
+    "dev": "concurrently \"tsc -p tsconfig.server.json --watch\" \"npm run build:imposter -- --watch\" \"npm run build:vibe-check -- --watch\" \"npm run build:never-have-i-ever -- --watch\" \"nodemon dist/server.js\""
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.0",
+    "concurrently": "^9.0.1",
+    "esbuild": "^0.23.1",
+    "nodemon": "^3.1.4",
+    "typescript": "^5.5.4"
+  }
+}

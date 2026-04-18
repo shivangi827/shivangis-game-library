@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vibe Check</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="floating-bg" aria-hidden="true">
+  <span class="floater" style="left:5%;animation-duration:18s;animation-delay:0s;font-size:2.2rem">🌶️</span>
+  <span class="floater" style="left:15%;animation-duration:22s;animation-delay:3s;font-size:1.6rem">🍍</span>
+  <span class="floater" style="left:25%;animation-duration:20s;animation-delay:7s;font-size:2rem">🔥</span>
+  <span class="floater" style="left:35%;animation-duration:24s;animation-delay:1s;font-size:1.4rem">🌶️</span>
+  <span class="floater" style="left:45%;animation-duration:19s;animation-delay:5s;font-size:2.4rem">🍍</span>
+  <span class="floater" style="left:55%;animation-duration:21s;animation-delay:9s;font-size:1.8rem">🔥</span>
+  <span class="floater" style="left:65%;animation-duration:23s;animation-delay:2s;font-size:1.5rem">🌶️</span>
+  <span class="floater" style="left:75%;animation-duration:17s;animation-delay:6s;font-size:2.1rem">🍍</span>
+  <span class="floater" style="left:85%;animation-duration:25s;animation-delay:4s;font-size:1.7rem">🔥</span>
+  <span class="floater" style="left:92%;animation-duration:20s;animation-delay:8s;font-size:2.3rem">🌶️</span>
+  <span class="floater" style="left:10%;animation-duration:26s;animation-delay:11s;font-size:1.3rem">🍍</span>
+  <span class="floater" style="left:50%;animation-duration:16s;animation-delay:13s;font-size:1.9rem">🌶️</span>
+  <span class="floater" style="left:30%;animation-duration:22s;animation-delay:10s;font-size:1.5rem">🔥</span>
+  <span class="floater" style="left:70%;animation-duration:19s;animation-delay:14s;font-size:2rem">🍍</span>
+  <span class="floater" style="left:40%;animation-duration:21s;animation-delay:12s;font-size:1.6rem">🌶️</span>
+</div>
+
+<div id="screen-home" class="screen active">
+  <div class="hero">
+    <div class="logo">
+      <h1>VIBE CHECK</h1>
+      <p class="tagline">How well do you know your friends?</p>
+    </div>
+    <div class="home-actions">
+      <button class="btn btn-primary btn-lg" id="btn-create">Create Room</button>
+      <div class="divider"><span>or</span></div>
+      <div class="join-form">
+        <input type="text" id="input-join-code" class="input" placeholder="Room Code" maxlength="5" />
+        <button class="btn btn-secondary btn-lg" id="btn-join">Join Room</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-name" class="modal hidden">
+  <div class="modal-box">
+    <h2 id="modal-name-title">Enter Your Name</h2>
+    <input type="text" id="input-name" class="input" placeholder="Your name" maxlength="20" autocomplete="off" />
+    <div id="modal-error" class="error-msg hidden"></div>
+    <button class="btn btn-primary" id="btn-name-confirm">Let's Go</button>
+  </div>
+</div>
+
+<div id="screen-lobby" class="screen hidden">
+  <div class="container">
+    <div class="room-code-banner">
+      <span class="label">Room Code</span>
+      <span id="lobby-code" class="code-display"></span>
+      <button class="btn btn-ghost btn-sm" id="btn-copy-code">Copy</button>
+    </div>
+
+    <div class="card">
+      <h2>Players <span id="lobby-player-count" class="count-badge"></span></h2>
+      <ul id="lobby-player-list" class="player-list"></ul>
+      <p id="lobby-waiting-msg" class="muted-text hidden">Waiting for more players... (need at least 2)</p>
+    </div>
+
+    <div id="host-settings" class="card hidden">
+      <h3>Settings</h3>
+      <div class="setting-row">
+        <label for="setting-rounds">Number of Rounds</label>
+        <select id="setting-rounds" class="select">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="host-start-area" class="hidden">
+      <button class="btn btn-primary btn-lg btn-full" id="btn-start-game">Start Game</button>
+    </div>
+    <div id="guest-waiting" class="hidden">
+      <p class="muted-text center">Waiting for the host to start...</p>
+    </div>
+  </div>
+</div>
+
+<div id="screen-round" class="screen hidden">
+  <div class="container center-content">
+    <div class="round-badge" id="round-badge">Round 1 / 10</div>
+    <div class="prompt-card">
+      <p class="prompt-text" id="round-prompt"></p>
+      <p class="prompt-scale">1 = Not at all &mdash; 10 = Absolutely</p>
+    </div>
+    <div class="answer-buttons" id="answer-buttons"></div>
+    <div id="answer-submitted" class="hidden">
+      <div class="submitted-badge">Answer locked in!</div>
+    </div>
+    <div class="answer-status" id="answer-status">0 / 0 answered</div>
+  </div>
+</div>
+
+<div id="screen-reveal" class="screen hidden">
+  <div class="container center-content">
+    <div class="round-badge" id="reveal-round-badge">Round 1 / 10</div>
+
+    <div class="number-line-wrapper">
+      <div class="number-line" id="number-line"></div>
+    </div>
+
+    <div class="outlier-callout" id="outlier-msg"></div>
+
+    <table class="reveal-table">
+      <thead>
+        <tr><th>Player</th><th>Answer</th><th>Points</th></tr>
+      </thead>
+      <tbody id="reveal-table"></tbody>
+    </table>
+
+    <div id="reveal-host-area" class="action-area hidden">
+      <button class="btn btn-primary btn-lg btn-full" id="btn-next-round">Next Round</button>
+    </div>
+    <div id="reveal-guest-area" class="hidden">
+      <p class="muted-text center">Waiting for host...</p>
+    </div>
+  </div>
+</div>
+
+<div id="screen-final" class="screen hidden">
+  <div class="container center-content">
+    <h1 class="final-title">Game Over</h1>
+    <p class="winner-announce"><span id="winner-name"></span> has the best vibes!</p>
+
+    <ol id="final-scoreboard" class="scoreboard-list"></ol>
+
+    <div id="final-host-area" class="action-area hidden">
+      <button class="btn btn-primary btn-lg btn-full" id="btn-play-again">Play Again</button>
+    </div>
+    <div id="final-guest-area" class="hidden">
+      <p class="muted-text center">Waiting for host to start a new game...</p>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
