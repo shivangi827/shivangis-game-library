@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shivangis-game-library.onrender.com/sitemap.xml
