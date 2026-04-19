@@ -90,6 +90,17 @@ $('btn-copy-code')?.addEventListener('click', () => {
   }
 });
 
+$('btn-copy-link')?.addEventListener('click', () => {
+  if (!state) return;
+  const url = `${window.location.origin}/never-have-i-ever?code=${state.code}`;
+  navigator.clipboard.writeText(url).catch(() => {});
+  const btn = $('btn-copy-link');
+  if (btn) {
+    btn.textContent = 'Copied!';
+    setTimeout(() => (btn.textContent = 'Copy Link'), 1500);
+  }
+});
+
 $('btn-start-game')?.addEventListener('click', () => socket.emit('start-game'));
 
 $('setting-rounds')?.addEventListener('change', (e) => {
@@ -285,3 +296,9 @@ socket.on('error-msg', (msg: string) => {
     errEl.classList.remove('hidden');
   }
 });
+
+const urlCode = new URLSearchParams(window.location.search).get('code');
+if (urlCode) {
+  ($('input-join-code') as HTMLInputElement).value = urlCode.toUpperCase();
+  $('btn-join')?.click();
+}

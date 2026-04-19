@@ -515,6 +515,18 @@ $('btn-copy-code').addEventListener('click', () => {
   });
 });
 
+$('btn-copy-link').addEventListener('click', () => {
+  if (!state.roomCode) return;
+  const url = `${window.location.origin}/imposter?code=${state.roomCode}`;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = $('btn-copy-link');
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.textContent = 'Copy Link';
+    }, 1500);
+  });
+});
+
 $('setting-imposters').addEventListener('change', (e) => {
   const target = e.target as HTMLSelectElement;
   socket.emit('update-settings', { numImposters: parseInt(target.value, 10) });
@@ -557,3 +569,9 @@ $('btn-play-again').addEventListener('click', () => {
 });
 
 showScreen('home');
+
+const urlCode = new URLSearchParams(window.location.search).get('code');
+if (urlCode) {
+  ($('input-join-code') as HTMLInputElement).value = urlCode.toUpperCase();
+  $('btn-join').click();
+}
