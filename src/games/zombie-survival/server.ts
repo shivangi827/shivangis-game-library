@@ -41,7 +41,7 @@ const MIN_PLAYERS = 4;
 const MAX_ROOMS = 200;
 const VOTE_DURATION = 30;
 const ZOMBIE_INTEL_DELAY = 15;
-const STARTING_LIVES = 3;
+const STARTING_LIVES = 1;
 
 export function setupZombieSurvival(rawNs: Namespace): void {
   const ns = rawNs as Namespace;
@@ -150,14 +150,26 @@ export function setupZombieSurvival(rawNs: Namespace): void {
       else if (p.vote === 'B') countB++;
     }
 
-    let majorityChoice: 'A' | 'B' | 'tie' = 'tie';
+    let majorityChoice: 'A' | 'B' | 'tie';
     if (countA > countB) majorityChoice = 'A';
     else if (countB > countA) majorityChoice = 'B';
+    else majorityChoice = 'tie';
 
     const bittenNames: string[] = [];
     const newZombieNames: string[] = [];
 
-    if (majorityChoice !== 'tie') {
+    if (majorityChoice === 'tie') {
+      const unlucky = humanPlayers[Math.floor(Math.random() * humanPlayers.length)];
+      if (unlucky) {
+        unlucky.lives--;
+        bittenNames.push(unlucky.name);
+        if (unlucky.lives <= 0) {
+          unlucky.status = 'zombie';
+          unlucky.lives = 0;
+          newZombieNames.push(unlucky.name);
+        }
+      }
+    } else {
       for (const p of humanPlayers) {
         if (p.vote !== majorityChoice) {
           p.lives--;

@@ -395,6 +395,7 @@ body.screen-shake {
 
 .lobby-meta { color: var(--ash); font-size: 0.9rem; }
 .lobby-waiting { color: var(--blood-glow); font-size: 0.85rem; }
+.lobby-hint { color: var(--ash); font-size: 0.8rem; font-style: italic; text-align: center; }
 
 .player-list {
   list-style: none;

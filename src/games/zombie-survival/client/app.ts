@@ -111,8 +111,8 @@ function renderReveal(): void {
   $('reveal-count-a').textContent = `${r.countA} vote${r.countA !== 1 ? 's' : ''}`;
   $('reveal-count-b').textContent = `${r.countB} vote${r.countB !== 1 ? 's' : ''}`;
 
-  if (isTie) {
-    $('reveal-flavor').textContent = 'A tie! Nobody gets bitten this round.';
+  if (isTie && r.bittenNames.length > 0) {
+    $('reveal-flavor').textContent = `A tie! The horde attacks in the chaos — ${r.bittenNames.join(', ')} was bitten!`;
   } else if (r.bittenNames.length === 0) {
     $('reveal-flavor').textContent = 'Unanimous decision — everyone survives!';
   } else {
