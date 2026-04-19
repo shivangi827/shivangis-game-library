@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zombie Survival</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/consent.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="storm-layer" aria-hidden="true"></div>
+<div class="rain-layer" aria-hidden="true"></div>
+
+<div class="floating-bg" aria-hidden="true">
+  <span class="floater" style="left:5%;animation-duration:22s;animation-delay:0s;font-size:1.4rem">&#x1F480;</span>
+  <span class="floater" style="left:15%;animation-duration:18s;animation-delay:3s;font-size:1.8rem">&#x2623;</span>
+  <span class="floater" style="left:28%;animation-duration:25s;animation-delay:7s;font-size:1.2rem">&#x1F480;</span>
+  <span class="floater" style="left:40%;animation-duration:20s;animation-delay:1s;font-size:1.6rem">&#x2623;</span>
+  <span class="floater" style="left:55%;animation-duration:23s;animation-delay:5s;font-size:1.3rem">&#x1F480;</span>
+  <span class="floater" style="left:68%;animation-duration:17s;animation-delay:9s;font-size:2rem">&#x2623;</span>
+  <span class="floater" style="left:80%;animation-duration:21s;animation-delay:2s;font-size:1.5rem">&#x1F480;</span>
+  <span class="floater" style="left:92%;animation-duration:19s;animation-delay:6s;font-size:1.7rem">&#x2623;</span>
+</div>
+
+<!-- ── Home ─────────────────────────────────────── -->
+<div id="screen-home" class="screen active">
+  <div class="card home-card">
+    <h1 class="title">Zombie<br/>Survival</h1>
+    <p class="subtitle">Survive the horde. Vote wisely. Trust no one.</p>
+
+    <button id="btn-create" class="btn btn-primary">Create Room</button>
+
+    <div class="divider"><span>or join a game</span></div>
+
+    <div class="join-row">
+      <input id="input-join-code" type="text" class="input" placeholder="Room code" maxlength="5" autocomplete="off" />
+      <button id="btn-join" class="btn btn-outline">Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Name Modal ──────────────────────────────── -->
+<div id="modal-name" class="modal-overlay hidden">
+  <div class="card modal-card">
+    <h2 id="modal-name-title" class="modal-title">Enter Your Name</h2>
+    <input id="input-name" type="text" class="input" placeholder="Survivor name" maxlength="20" autocomplete="off" />
+    <p id="modal-error" class="error-msg hidden"></p>
+    <button id="btn-name-confirm" class="btn btn-primary">Enter the Wasteland</button>
+  </div>
+</div>
+
+<!-- ── Lobby ────────────────────────────────────── -->
+<div id="screen-lobby" class="screen hidden">
+  <div class="card lobby-card">
+    <h2 class="screen-title">Safe House</h2>
+
+    <div class="code-box">
+      <span class="code-label">Room Code</span>
+      <span id="lobby-code" class="code-value"></span>
+      <button id="btn-copy-code" class="btn-icon">Copy</button>
+      <button id="btn-copy-link" class="btn-icon">Copy Link</button>
+    </div>
+
+    <p class="lobby-meta"><span id="lobby-player-count">0</span> survivors assembled</p>
+    <p id="lobby-waiting-msg" class="lobby-waiting hidden">Need at least 4 survivors to begin</p>
+
+    <ul id="lobby-player-list" class="player-list"></ul>
+
+    <div id="host-settings" class="host-settings hidden">
+      <label class="setting-label">
+        Rounds
+        <select id="setting-rounds" class="select">
+          <option value="8">8</option>
+          <option value="10" selected>10</option>
+          <option value="12">12</option>
+          <option value="15">15</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="host-start-area" class="hidden">
+      <button id="btn-start-game" class="btn btn-primary btn-full" disabled>Survive</button>
+    </div>
+    <div id="guest-waiting" class="guest-msg hidden">
+      <p>Waiting for host to begin...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Voting ───────────────────────────────────── -->
+<div id="screen-voting" class="screen hidden">
+  <div class="card vote-card">
+    <span id="round-badge" class="badge">Round 1 / 10</span>
+
+    <div class="status-bar">
+      <span id="vote-humans" class="status-humans">5 humans</span>
+      <span id="vote-zombies" class="status-zombies">0 zombies</span>
+    </div>
+
+    <div id="vote-zombie-badge" class="zombie-badge hidden">You are a zombie. Sabotage wisely.</div>
+
+    <h2 class="situation-label">The situation:</h2>
+    <p id="vote-situation" class="situation-text"></p>
+
+    <div class="timer-bar">
+      <div id="timer-bar-fill" class="timer-bar-fill"></div>
+    </div>
+    <span id="vote-timer" class="timer-text">30</span>
+
+    <div id="vote-buttons" class="vote-options">
+      <button id="btn-option-a" class="btn btn-vote btn-vote-a"></button>
+      <button id="btn-option-b" class="btn btn-vote btn-vote-b"></button>
+    </div>
+
+    <div id="vote-submitted" class="submitted-msg hidden">Vote locked in. Waiting for others...</div>
+
+    <p id="vote-status" class="vote-status">0 / 0 voted</p>
+
+    <div id="zombie-intel" class="zombie-intel hidden">
+      <h3>Zombie Intel</h3>
+      <p>Option A: <span id="intel-count-a">0</span> &mdash; Option B: <span id="intel-count-b">0</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Reveal ───────────────────────────────────── -->
+<div id="screen-reveal" class="screen hidden">
+  <div class="card reveal-card">
+    <span id="reveal-badge" class="badge">Round 1 / 10</span>
+    <p id="reveal-situation" class="situation-text situation-sm"></p>
+
+    <p id="reveal-flavor" class="flavor-text"></p>
+    <p id="reveal-turned" class="turned-text hidden"></p>
+
+    <div class="reveal-split">
+      <div id="reveal-col-a" class="reveal-col">
+        <h3 id="reveal-option-a" class="col-title"></h3>
+        <span id="reveal-count-a" class="col-count"></span>
+        <ul id="reveal-list-a" class="reveal-list"></ul>
+      </div>
+      <div id="reveal-col-b" class="reveal-col">
+        <h3 id="reveal-option-b" class="col-title"></h3>
+        <span id="reveal-count-b" class="col-count"></span>
+        <ul id="reveal-list-b" class="reveal-list"></ul>
+      </div>
+    </div>
+
+    <ul id="reveal-status-list" class="status-list"></ul>
+
+    <div id="reveal-host-area" class="hidden">
+      <button id="btn-next-round" class="btn btn-primary btn-full">Next Round</button>
+    </div>
+    <div id="reveal-guest-area" class="guest-msg hidden">
+      <p>Waiting for host...</p>
+    </div>
+    <div id="final-from-reveal" class="hidden">
+      <button id="btn-play-again-reveal" class="btn btn-primary btn-full">Play Again</button>
+    </div>
+    <div id="final-from-reveal-guest" class="guest-msg hidden">
+      <p>Waiting for host...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Final ────────────────────────────────────── -->
+<div id="screen-final" class="screen hidden">
+  <div class="card final-card">
+    <h2 id="final-title" class="screen-title"></h2>
+    <p id="final-subtitle" class="final-subtitle"></p>
+
+    <ul id="final-scoreboard" class="scoreboard"></ul>
+
+    <div id="final-host-area" class="hidden">
+      <button id="btn-play-again" class="btn btn-primary btn-full">Play Again</button>
+    </div>
+    <div id="final-guest-area" class="guest-msg hidden">
+      <p>Waiting for host...</p>
+    </div>
+  </div>
+</div>
+
+<div id="modal-terms" class="terms-overlay hidden" role="dialog" aria-modal="true">
+  <div class="terms-box">
+    <h2>Terms of Use</h2>
+    <div class="terms-body">
+      <p>Shivangi's Game Library is a free collection of party games. By using it you agree to the following:</p>
+      <ul>
+        <li>This site uses <strong>Microsoft Clarity</strong> to collect anonymous analytics and session replays (page views, clicks, mouse movement, navigation). Clarity sets cookies in your browser.</li>
+        <li>We do not sell your data or share it outside of Clarity.</li>
+        <li>Names you enter in rooms are visible to other players in the same room until the room is closed.</li>
+        <li>The games are provided as-is with no warranty.</li>
+        <li>Don't use the site to harass others or abuse the service.</li>
+      </ul>
+    </div>
+    <button class="terms-btn terms-btn-accept" id="btn-terms-accept">I Agree &amp; Play</button>
+    <button class="terms-btn terms-btn-close hidden" id="btn-terms-close">Close</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <a href="#" id="footer-terms">Terms</a>
+</footer>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
+<script src="/consent.js"></script>
+</body>
+</html>

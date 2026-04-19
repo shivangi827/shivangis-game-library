@@ -6,5 +6,7 @@ public/vibe-check/app.js
 public/vibe-check/app.js.map
 public/never-have-i-ever/app.js
 public/never-have-i-ever/app.js.map
+public/zombie-survival/app.js
+public/zombie-survival/app.js.map
 *.pdf
 .DS_Store

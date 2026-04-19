@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import { setupImposter } from './games/imposter/server';
 import { setupVibeCheck } from './games/vibe-check/server';
 import { setupNeverHaveIEver } from './games/never-have-i-ever/server';
+import { setupZombieSurvival } from './games/zombie-survival/server';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,10 +27,14 @@ app.get('/vibe-check', (_req, res) => {
 app.get('/never-have-i-ever', (_req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'never-have-i-ever', 'index.html'));
 });
+app.get('/zombie-survival', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'zombie-survival', 'index.html'));
+});
 
 setupImposter(io.of('/imposter'));
 setupVibeCheck(io.of('/vibe-check'));
 setupNeverHaveIEver(io.of('/never-have-i-ever'));
+setupZombieSurvival(io.of('/zombie-survival'));
 
 const PORT = Number(process.env.PORT) || 3000;
 server.listen(PORT, () => {

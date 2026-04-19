@@ -75,6 +75,7 @@ body {
 .card-imposter:hover { border-color: #ff8080; }
 .card-vibe:hover { border-color: #FF7A3D; }
 .card-nhie:hover { border-color: #FA003F; }
+.card-zombie:hover { border-color: #39FF14; }
 
 .card-img {
   width: 90px;
@@ -97,6 +98,7 @@ body {
 .card-imposter h2 { color: #ff8080; }
 .card-vibe h2 { color: #FF7A3D; }
 .card-nhie h2 { color: #FA003F; }
+.card-zombie h2 { color: #39FF14; }
 
 .game-card p {
   color: var(--text-muted);
