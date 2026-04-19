@@ -1,6 +1,7 @@
-import { allWords, TimeMode, TIME_LABELS, Word } from '../shared/words';
+import { allWords, TimeMode, Word } from '../shared/words';
 
 interface LeaderboardEntry {
+  name: string;
   score: number;
   words: number;
   streak: number;
@@ -21,10 +22,10 @@ interface GameState {
   timerInterval: number | null;
   scrambled: string;
   hintRevealed: boolean;
-  started: boolean;
 }
 
 const STORAGE_KEY = 'gramble.leaderboard';
+const NAME_KEY = 'gramble.name';
 const MAX_ENTRIES = 10;
 
 function shuffle<T>(arr: T[]): T[] {
@@ -45,6 +46,13 @@ function scrambleWord(word: string): string {
     attempts++;
   } while (scrambled === word && attempts < 20);
   return scrambled;
+}
+
+function isValidAnswer(guess: string, word: Word): boolean {
+  const lower = guess.toLowerCase();
+  if (lower === word.word.toLowerCase()) return true;
+  if (word.alts && word.alts.some(a => a.toLowerCase() === lower)) return true;
+  return false;
 }
 
 function loadLeaderboard(): Leaderboard {
@@ -74,6 +82,14 @@ function getScores(timeMode: TimeMode): LeaderboardEntry[] {
   return lb[String(timeMode)] || [];
 }
 
+function getSavedName(): string {
+  return localStorage.getItem(NAME_KEY) || '';
+}
+
+function saveName(name: string) {
+  localStorage.setItem(NAME_KEY, name);
+}
+
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 const screenHome = $('screen-home');
@@ -100,6 +116,10 @@ const gameWords = $('game-words');
 const gameFeedback = $('game-feedback');
 const btnSkip = $('btn-skip');
 
+const modalName = $('modal-name');
+const nameInput = $<HTMLInputElement>('input-name');
+const btnNameConfirm = $('btn-name-confirm');
+
 const overTitle = $('over-title');
 const overScore = $('over-score');
 const overStreak = $('over-streak');
@@ -110,10 +130,17 @@ const btnPlayAgain = $('btn-play-again');
 
 let state: GameState;
 let activeLbTab: TimeMode = 60;
+let pendingTimeMode: TimeMode = 60;
 
 function showScreen(screen: HTMLElement) {
   [screenHome, screenGame, screenOver].forEach(s => s.classList.add('hidden'));
   screen.classList.remove('hidden');
+}
+
+function escapeHtml(s: string): string {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
 }
 
 function renderHomeLb(mode: TimeMode) {
@@ -133,11 +160,38 @@ function renderHomeLb(mode: TimeMode) {
   homeLbList.innerHTML = scores.map((s, i) => `
     <li class="lb-entry ${i === 0 ? 'lb-gold' : ''}">
       <span class="lb-rank">${i + 1}</span>
+      <span class="lb-name">${escapeHtml(s.name || 'Anonymous')}</span>
       <span class="lb-score">${s.score}</span>
-      <span class="lb-detail">${s.words} words &middot; ${s.streak} best streak</span>
+      <span class="lb-detail">${s.words} words</span>
       <span class="lb-date">${s.date}</span>
     </li>
   `).join('');
+}
+
+function promptName(callback: () => void) {
+  const saved = getSavedName();
+  if (saved) {
+    nameInput.value = saved;
+  }
+  modalName.classList.remove('hidden');
+  nameInput.focus();
+
+  function confirm() {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    saveName(name);
+    modalName.classList.add('hidden');
+    btnNameConfirm.removeEventListener('click', confirm);
+    nameInput.removeEventListener('keydown', onKey);
+    callback();
+  }
+
+  function onKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') confirm();
+  }
+
+  btnNameConfirm.addEventListener('click', confirm);
+  nameInput.addEventListener('keydown', onKey);
 }
 
 function startGame(timeMode: TimeMode) {
@@ -154,11 +208,20 @@ function startGame(timeMode: TimeMode) {
     timerInterval: null,
     scrambled: '',
     hintRevealed: false,
-    started: false,
   };
   showScreen(screenGame);
   loadWord();
   startCountdown();
+}
+
+function handleTimeSelect(timeMode: TimeMode) {
+  pendingTimeMode = timeMode;
+  const saved = getSavedName();
+  if (saved) {
+    startGame(timeMode);
+  } else {
+    promptName(() => startGame(timeMode));
+  }
 }
 
 function loadWord() {
@@ -232,7 +295,7 @@ function checkAnswer() {
 
   if (!guess) return;
 
-  if (guess === word.word.toLowerCase()) {
+  if (isValidAnswer(guess, word)) {
     const streakMultiplier = 1 + Math.floor(state.streak / 3) * 0.25;
     const points = Math.round(word.points * streakMultiplier);
 
@@ -298,7 +361,10 @@ function endGame() {
   stopTimer();
   showScreen(screenOver);
 
+  const playerName = getSavedName() || 'Anonymous';
+
   const entry: LeaderboardEntry = {
+    name: playerName,
     score: state.score,
     words: state.wordsCompleted,
     streak: state.bestStreak,
@@ -319,10 +385,11 @@ function endGame() {
 
   const scores = getScores(state.timeMode);
   overLbList.innerHTML = scores.map((s, i) => {
-    const isCurrent = s.score === state.score && s.words === state.wordsCompleted && s.date === entry.date;
+    const isCurrent = s.score === state.score && s.words === state.wordsCompleted && s.date === entry.date && s.name === playerName;
     return `
       <li class="lb-entry ${i === 0 ? 'lb-gold' : ''} ${isCurrent ? 'lb-current' : ''}">
         <span class="lb-rank">${i + 1}</span>
+        <span class="lb-name">${escapeHtml(s.name || 'Anonymous')}</span>
         <span class="lb-score">${s.score}</span>
         <span class="lb-detail">${s.words} words</span>
         <span class="lb-date">${s.date}</span>
@@ -338,9 +405,9 @@ gameInput.addEventListener('keydown', (e) => {
 btnHint.addEventListener('click', revealHint);
 btnSkip.addEventListener('click', skipWord);
 
-btn60.addEventListener('click', () => startGame(60));
-btn90.addEventListener('click', () => startGame(90));
-btn120.addEventListener('click', () => startGame(120));
+btn60.addEventListener('click', () => handleTimeSelect(60));
+btn90.addEventListener('click', () => handleTimeSelect(90));
+btn120.addEventListener('click', () => handleTimeSelect(120));
 btnPlayAgain.addEventListener('click', () => {
   renderHomeLb(activeLbTab);
   showScreen(screenHome);

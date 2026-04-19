@@ -78,10 +78,10 @@
       <label class="setting-label">
         Rounds
         <select id="setting-rounds" class="select">
-          <option value="3">3</option>
+          <option value="3" selected>3</option>
           <option value="5">5</option>
           <option value="8">8</option>
-          <option value="10" selected>10</option>
+          <option value="10">10</option>
           <option value="12">12</option>
           <option value="15">15</option>
           <option value="20">20</option>
@@ -211,6 +211,9 @@
   </div>
 </div>
 
+<audio id="bg-music" src="music/Concrete_Teeth.mp3" loop preload="auto"></audio>
+<button id="btn-music" class="music-toggle" title="Toggle music">&#x1F50A;</button>
+
 <footer class="site-footer">
   <a href="#" id="footer-terms">Terms</a>
 </footer>
@@ -234,6 +237,36 @@
     setTimeout(strike, next);
   }
   setTimeout(strike, 5000 + Math.random() * 10000);
+})();
+</script>
+<script>
+(function() {
+  var audio = document.getElementById('bg-music');
+  var btn = document.getElementById('btn-music');
+  var started = false;
+  audio.volume = 0.35;
+
+  function tryPlay() {
+    if (started) return;
+    audio.play().then(function() {
+      started = true;
+      btn.innerHTML = '&#x1F50A;';
+    }).catch(function() {});
+  }
+
+  document.addEventListener('click', tryPlay, { once: false });
+  document.addEventListener('keydown', tryPlay, { once: false });
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (audio.paused) {
+      audio.play();
+      btn.innerHTML = '&#x1F50A;';
+    } else {
+      audio.pause();
+      btn.innerHTML = '&#x1F507;';
+    }
+  });
 })();
 </script>
 </body>

@@ -287,7 +287,7 @@ export function setupZombieSurvival(rawNs: Namespace): void {
         }],
         state: 'lobby',
         currentRound: 0,
-        totalRounds: 10,
+        totalRounds: 3,
         currentScenario: null,
         usedPromptIndices: new Set(),
         roundResult: null,

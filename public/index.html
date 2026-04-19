@@ -20,46 +20,75 @@
 
     <div class="game-grid">
 
-      <a href="/imposter" class="game-card card-imposter">
+      <div class="game-card card-imposter">
         <img src="imposter/images/detective.png" alt="Detective cat" class="card-img" />
         <h2>Imposter</h2>
-        <p>The word bluffing party game. One player is the imposter — can you figure out who?</p>
+        <p>The word bluffing party game. One player is the imposter &mdash; can you figure out who?</p>
         <span class="card-meta">3-8 players</span>
-      </a>
+        <div class="card-actions">
+          <a href="/imposter" class="btn-play">Play</a>
+          <button class="btn-how" data-game="imposter">How to Play</button>
+        </div>
+      </div>
 
-      <a href="/vibe-check" class="game-card card-vibe">
-        <div class="card-icon">🌶️</div>
+      <div class="game-card card-vibe">
+        <div class="card-icon">&#x1F336;&#xFE0F;</div>
         <h2>Vibe Check</h2>
         <p>Rate prompts 1-10. The closer you are to the group average, the more you score!</p>
         <span class="card-meta">2-10 players</span>
-      </a>
+        <div class="card-actions">
+          <a href="/vibe-check" class="btn-play">Play</a>
+          <button class="btn-how" data-game="vibe-check">How to Play</button>
+        </div>
+      </div>
 
-      <a href="/never-have-i-ever" class="game-card card-nhie">
+      <div class="game-card card-nhie">
         <img src="never-have-i-ever/images/wine.png" alt="Two cats clinking wine" class="card-img" />
         <h2>Never Have I Ever</h2>
-        <p>Confess or stay innocent — who's the wildest in the group?</p>
+        <p>Confess or stay innocent &mdash; who's the wildest in the group?</p>
         <span class="card-meta">2-10 players</span>
-      </a>
+        <div class="card-actions">
+          <a href="/never-have-i-ever" class="btn-play">Play</a>
+          <button class="btn-how" data-game="nhie">How to Play</button>
+        </div>
+      </div>
 
-      <a href="/zombie-survival" class="game-card card-zombie">
+      <div class="game-card card-zombie">
         <div class="card-icon">&#x1F9DF;</div>
         <h2>Zombie Survival</h2>
-        <p>Survive the apocalypse. Vote with the majority or get bitten. Trust no one.</p>
+        <p>You and your friends are trapped in a zombie apocalypse. Make life-or-death decisions &mdash; survive or turn.</p>
         <span class="card-meta">4-10 players</span>
-      </a>
+        <div class="card-actions">
+          <a href="/zombie-survival" class="btn-play">Play</a>
+          <button class="btn-how" data-game="zombie">How to Play</button>
+        </div>
+      </div>
 
-      <a href="/word-scramble" class="game-card card-scramble">
+      <div class="game-card card-scramble">
         <div class="card-icon">&#x1F331;</div>
         <h2>Gramble</h2>
         <p>Unscramble words against the clock. How many can you solve before time runs out?</p>
         <span class="card-meta">Single player</span>
-      </a>
+        <div class="card-actions">
+          <a href="/word-scramble" class="btn-play">Play</a>
+          <button class="btn-how" data-game="gramble">How to Play</button>
+        </div>
+      </div>
 
     </div>
 
     <footer class="footer">
       <p>Made with love by Shivangi</p>
     </footer>
+  </div>
+
+  <!-- How to Play Modal -->
+  <div id="modal-how" class="how-overlay hidden">
+    <div class="how-box">
+      <button class="how-close" id="how-close">&times;</button>
+      <h2 id="how-title"></h2>
+      <div id="how-body"></div>
+    </div>
   </div>
 
   <div id="modal-terms" class="terms-overlay hidden" role="dialog" aria-modal="true">
@@ -85,5 +114,92 @@
   </footer>
 
   <script src="/consent.js"></script>
+  <script>
+  (function() {
+    var guides = {
+      imposter: {
+        title: 'How to Play Imposter',
+        body: '<ol>' +
+          '<li><strong>Create or join a room</strong> &mdash; one player creates the room and shares the code with friends.</li>' +
+          '<li><strong>Everyone gets a secret word</strong> &mdash; all players see the same word, except the Imposter who gets a different one.</li>' +
+          '<li><strong>Discuss!</strong> &mdash; take turns describing your word without saying it. Try to figure out who has the odd word out.</li>' +
+          '<li><strong>Vote</strong> &mdash; everyone votes on who they think the Imposter is.</li>' +
+          '<li><strong>Reveal</strong> &mdash; if the group catches the Imposter, they win. If the Imposter survives, they win!</li>' +
+          '</ol>'
+      },
+      'vibe-check': {
+        title: 'How to Play Vibe Check',
+        body: '<ol>' +
+          '<li><strong>Create or join a room</strong> &mdash; share the room code with your friends.</li>' +
+          '<li><strong>A prompt appears</strong> &mdash; something like "How likely are you to eat pizza for breakfast?"</li>' +
+          '<li><strong>Rate it 1-10</strong> &mdash; everyone answers secretly.</li>' +
+          '<li><strong>Scores revealed</strong> &mdash; the closer your answer is to the group average, the more points you earn.</li>' +
+          '<li><strong>The player with the best vibes wins!</strong></li>' +
+          '</ol>'
+      },
+      nhie: {
+        title: 'How to Play Never Have I Ever',
+        body: '<ol>' +
+          '<li><strong>Create or join a room</strong> &mdash; share the room code.</li>' +
+          '<li><strong>A prompt appears</strong> &mdash; "Never have I ever..." followed by something wild.</li>' +
+          '<li><strong>Confess or deny</strong> &mdash; press "I Have" if you\'ve done it, or "Never" if you haven\'t.</li>' +
+          '<li><strong>Reveal</strong> &mdash; see who\'s guilty and who\'s innocent each round.</li>' +
+          '<li><strong>The player with the most confessions is The Wild One!</strong></li>' +
+          '</ol>'
+      },
+      zombie: {
+        title: 'How to Play Zombie Survival',
+        body: '<p class="how-story">The world has fallen. A zombie outbreak has swept through everything you knew. ' +
+          'You and your friends have barricaded yourselves in a safe house, but supplies are running low and the horde is closing in. ' +
+          'Every decision could be your last. Will you survive &mdash; or join the undead?</p>' +
+          '<ol>' +
+          '<li><strong>Create or join a room</strong> &mdash; gather at least 4 survivors.</li>' +
+          '<li><strong>Face a dilemma</strong> &mdash; each round presents a life-or-death scenario with two options.</li>' +
+          '<li><strong>Vote secretly</strong> &mdash; choose Option A or Option B before the 30-second timer runs out.</li>' +
+          '<li><strong>Majority survives</strong> &mdash; players who voted with the minority get bitten and turn into zombies.</li>' +
+          '<li><strong>Zombies sabotage</strong> &mdash; turned players can see live vote counts and try to split the group.</li>' +
+          '<li><strong>Last humans standing win!</strong> &mdash; or if zombies outnumber humans, the horde takes over.</li>' +
+          '</ol>'
+      },
+      gramble: {
+        title: 'How to Play Gramble',
+        body: '<ol>' +
+          '<li><strong>Pick a timer</strong> &mdash; choose 1 minute, 1:30, or 2 minutes.</li>' +
+          '<li><strong>Unscramble the word</strong> &mdash; jumbled letters appear on screen. Type the correct word and press Enter.</li>' +
+          '<li><strong>Score points</strong> &mdash; longer words are worth more. 4 letters = 100pts, 5 = 150, 6 = 200, 7 = 300, 8+ = 400.</li>' +
+          '<li><strong>Build streaks</strong> &mdash; every 3 correct answers in a row increases your score multiplier.</li>' +
+          '<li><strong>Use hints or skip</strong> &mdash; stuck? Reveal a hint or skip to the next word.</li>' +
+          '<li><strong>Beat your best!</strong> &mdash; scores are saved to your personal leaderboard.</li>' +
+          '</ol>'
+      }
+    };
+
+    var modal = document.getElementById('modal-how');
+    var title = document.getElementById('how-title');
+    var body = document.getElementById('how-body');
+    var closeBtn = document.getElementById('how-close');
+
+    document.querySelectorAll('.btn-how').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var game = btn.getAttribute('data-game');
+        var guide = guides[game];
+        if (!guide) return;
+        title.textContent = guide.title;
+        body.innerHTML = guide.body;
+        modal.classList.remove('hidden');
+      });
+    });
+
+    closeBtn.addEventListener('click', function() {
+      modal.classList.add('hidden');
+    });
+
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) modal.classList.add('hidden');
+    });
+  })();
+  </script>
 </body>
 </html>

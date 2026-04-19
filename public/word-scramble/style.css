@@ -565,6 +565,51 @@ body {
   color: var(--text-light);
 }
 
+/* Name Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 94, 32, 0.25);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+}
+
+.modal-overlay.hidden { display: none; }
+
+.modal-card {
+  max-width: 380px;
+  padding: 2rem 1.8rem;
+}
+
+.modal-title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.5rem;
+  color: var(--accent-dark);
+  margin-bottom: 1rem;
+}
+
+.modal-card .game-input {
+  margin-bottom: 1rem;
+}
+
+/* Leaderboard name */
+.lb-name {
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-detail {
+  flex: none;
+}
+
 /* Primary button */
 .btn-primary {
   display: block;
