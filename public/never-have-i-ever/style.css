@@ -144,6 +144,10 @@ body {
   width: 140px;
 }
 
+.scene-img-xs {
+  width: 90px;
+}
+
 /* ── Buttons ───────────────────────────────────── */
 .btn {
   display: inline-flex;
