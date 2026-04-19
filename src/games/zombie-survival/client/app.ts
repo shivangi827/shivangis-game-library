@@ -150,6 +150,7 @@ function renderFinal(): void {
     : 'Against all odds, humanity endures!';
 
   $('final-card').className = `card final-card ${isZombieWin ? 'zombie-win' : 'human-win'}`;
+  ($('final-img') as HTMLImageElement).src = isZombieWin ? 'images/zombie-cheering.png' : 'images/human-winner.png';
 
   const board = $('final-scoreboard');
   board.innerHTML = '';

@@ -29,6 +29,7 @@
 <!-- ── Home ─────────────────────────────────────── -->
 <div id="screen-home" class="screen active">
   <div class="card home-card">
+    <img src="images/zombie.png" alt="Zombie scientist" class="scene-img" />
     <h1 class="title">Zombie<br/>Survival</h1>
     <p class="subtitle">Survive the horde. Vote wisely. Trust no one.</p>
 
@@ -56,6 +57,7 @@
 <!-- ── Lobby ────────────────────────────────────── -->
 <div id="screen-lobby" class="screen hidden">
   <div class="card lobby-card">
+    <img src="images/zombie-clinking.png" alt="Zombies clinking glasses" class="scene-img scene-img-sm" />
     <h2 class="screen-title">Safe House</h2>
 
     <div class="code-box">
@@ -74,10 +76,13 @@
       <label class="setting-label">
         Rounds
         <select id="setting-rounds" class="select">
+          <option value="3">3</option>
+          <option value="5">5</option>
           <option value="8">8</option>
           <option value="10" selected>10</option>
           <option value="12">12</option>
           <option value="15">15</option>
+          <option value="20">20</option>
         </select>
       </label>
     </div>
@@ -94,6 +99,7 @@
 <!-- ── Voting ───────────────────────────────────── -->
 <div id="screen-voting" class="screen hidden">
   <div class="card vote-card">
+    <img src="images/human-vs-zombie.png" alt="Human vs zombie" class="scene-img scene-img-sm" />
     <span id="round-badge" class="badge">Round 1 / 10</span>
 
     <div class="status-bar">
@@ -130,6 +136,7 @@
 <!-- ── Reveal ───────────────────────────────────── -->
 <div id="screen-reveal" class="screen hidden">
   <div class="card reveal-card">
+    <img src="images/zombie-eating.png" alt="Zombie bite" class="scene-img scene-img-sm" />
     <span id="reveal-badge" class="badge">Round 1 / 10</span>
     <p id="reveal-situation" class="situation-text situation-sm"></p>
 
@@ -169,6 +176,7 @@
 <!-- ── Final ────────────────────────────────────── -->
 <div id="screen-final" class="screen hidden">
   <div class="card final-card">
+    <img id="final-img" src="images/zombie-cheering.png" alt="" class="scene-img" />
     <h2 id="final-title" class="screen-title"></h2>
     <p id="final-subtitle" class="final-subtitle"></p>
 
@@ -208,5 +216,23 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="app.js"></script>
 <script src="/consent.js"></script>
+<script>
+(function() {
+  var storm = document.querySelector('.storm-layer');
+  function strike() {
+    storm.classList.remove('flash');
+    void storm.offsetWidth;
+    storm.classList.add('flash');
+    document.body.classList.add('screen-shake');
+    setTimeout(function() {
+      storm.classList.remove('flash');
+      document.body.classList.remove('screen-shake');
+    }, 700);
+    var next = 90000 + Math.random() * 90000;
+    setTimeout(strike, next);
+  }
+  setTimeout(strike, 5000 + Math.random() * 10000);
+})();
+</script>
 </body>
 </html>

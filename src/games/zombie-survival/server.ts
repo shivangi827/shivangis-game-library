@@ -320,7 +320,7 @@ export function setupZombieSurvival(rawNs: Namespace): void {
     socket.on('update-settings', (data: { totalRounds?: number }) => {
       const room = getRoomForSocket(socket);
       if (!room || room.hostId !== socket.id || room.state !== 'lobby') return;
-      if (data.totalRounds && [8, 10, 12, 15].includes(data.totalRounds)) {
+      if (data.totalRounds && [3, 5, 8, 10, 12, 15, 20].includes(data.totalRounds)) {
         room.totalRounds = data.totalRounds;
         broadcastState(room);
       }
