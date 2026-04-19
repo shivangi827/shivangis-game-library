@@ -30,6 +30,9 @@ app.get('/never-have-i-ever', (_req, res) => {
 app.get('/zombie-survival', (_req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'zombie-survival', 'index.html'));
 });
+app.get('/word-scramble', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'word-scramble', 'index.html'));
+});
 
 setupImposter(io.of('/imposter'));
 setupVibeCheck(io.of('/vibe-check'));
