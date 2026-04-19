@@ -1,28 +1,31 @@
-import { wordsByDifficulty, Difficulty, Word } from '../shared/words';
+import { allWords, TimeMode, TIME_LABELS, Word } from '../shared/words';
+
+interface LeaderboardEntry {
+  score: number;
+  words: number;
+  streak: number;
+  date: string;
+}
+
+type Leaderboard = Record<string, LeaderboardEntry[]>;
 
 interface GameState {
-  difficulty: Difficulty;
+  timeMode: TimeMode;
   words: Word[];
   currentIndex: number;
   score: number;
   streak: number;
   bestStreak: number;
-  lives: number;
-  maxLives: number;
+  wordsCompleted: number;
   timeLeft: number;
   timerInterval: number | null;
   scrambled: string;
   hintRevealed: boolean;
-  gameOver: boolean;
+  started: boolean;
 }
 
-const ROUND_TIME: Record<Difficulty, number> = {
-  easy: 25,
-  medium: 20,
-  hard: 18,
-};
-
-const MAX_LIVES = 3;
+const STORAGE_KEY = 'gramble.leaderboard';
+const MAX_ENTRIES = 10;
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -44,74 +47,129 @@ function scrambleWord(word: string): string {
   return scrambled;
 }
 
+function loadLeaderboard(): Leaderboard {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return { '60': [], '90': [], '120': [] };
+}
+
+function saveLeaderboard(lb: Leaderboard) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+}
+
+function addScore(timeMode: TimeMode, entry: LeaderboardEntry) {
+  const lb = loadLeaderboard();
+  const key = String(timeMode);
+  if (!lb[key]) lb[key] = [];
+  lb[key].push(entry);
+  lb[key].sort((a, b) => b.score - a.score);
+  lb[key] = lb[key].slice(0, MAX_ENTRIES);
+  saveLeaderboard(lb);
+}
+
+function getScores(timeMode: TimeMode): LeaderboardEntry[] {
+  const lb = loadLeaderboard();
+  return lb[String(timeMode)] || [];
+}
+
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 const screenHome = $('screen-home');
 const screenGame = $('screen-game');
 const screenOver = $('screen-over');
 
-const btnEasy = $('btn-easy');
-const btnMedium = $('btn-medium');
-const btnHard = $('btn-hard');
+const btn60 = $('btn-60');
+const btn90 = $('btn-90');
+const btn120 = $('btn-120');
+
+const homeTabs = document.querySelectorAll<HTMLButtonElement>('.lb-tab');
+const homeLbList = $('home-lb-list');
+const homeLbEmpty = $('home-lb-empty');
 
 const gameScrambled = $('game-scrambled');
 const gameInput = $<HTMLInputElement>('game-input');
 const gameHint = $('game-hint');
 const btnHint = $('btn-hint');
-const gameTimer = $('game-timer');
-const timerFill = $('timer-fill');
+const gameCountdown = $('game-countdown');
+const countdownFill = $('countdown-fill');
 const gameScore = $('game-score');
 const gameStreak = $('game-streak');
-const gameLives = $('game-lives');
-const gameProgress = $('game-progress');
+const gameWords = $('game-words');
 const gameFeedback = $('game-feedback');
 const btnSkip = $('btn-skip');
 
 const overTitle = $('over-title');
 const overScore = $('over-score');
 const overStreak = $('over-streak');
-const overWords = $('over-words');
+const overWordsCount = $('over-words-count');
+const overLbList = $('over-lb-list');
+const overNewBest = $('over-new-best');
 const btnPlayAgain = $('btn-play-again');
-const overWordsCompleted = $('over-words-completed');
 
 let state: GameState;
+let activeLbTab: TimeMode = 60;
 
 function showScreen(screen: HTMLElement) {
   [screenHome, screenGame, screenOver].forEach(s => s.classList.add('hidden'));
   screen.classList.remove('hidden');
 }
 
-function startGame(difficulty: Difficulty) {
-  const allWords = shuffle(wordsByDifficulty[difficulty]);
+function renderHomeLb(mode: TimeMode) {
+  activeLbTab = mode;
+  homeTabs.forEach(tab => {
+    tab.classList.toggle('active', Number(tab.dataset.mode) === mode);
+  });
+
+  const scores = getScores(mode);
+  if (scores.length === 0) {
+    homeLbList.innerHTML = '';
+    homeLbEmpty.classList.remove('hidden');
+    return;
+  }
+
+  homeLbEmpty.classList.add('hidden');
+  homeLbList.innerHTML = scores.map((s, i) => `
+    <li class="lb-entry ${i === 0 ? 'lb-gold' : ''}">
+      <span class="lb-rank">${i + 1}</span>
+      <span class="lb-score">${s.score}</span>
+      <span class="lb-detail">${s.words} words &middot; ${s.streak} best streak</span>
+      <span class="lb-date">${s.date}</span>
+    </li>
+  `).join('');
+}
+
+function startGame(timeMode: TimeMode) {
+  const shuffled = shuffle([...allWords]);
   state = {
-    difficulty,
-    words: allWords,
+    timeMode,
+    words: shuffled,
     currentIndex: 0,
     score: 0,
     streak: 0,
     bestStreak: 0,
-    lives: MAX_LIVES,
-    maxLives: MAX_LIVES,
-    timeLeft: ROUND_TIME[difficulty],
+    wordsCompleted: 0,
+    timeLeft: timeMode,
     timerInterval: null,
     scrambled: '',
     hintRevealed: false,
-    gameOver: false,
+    started: false,
   };
   showScreen(screenGame);
   loadWord();
+  startCountdown();
 }
 
 function loadWord() {
-  if (state.currentIndex >= state.words.length || state.lives <= 0) {
-    endGame();
-    return;
+  if (state.currentIndex >= state.words.length) {
+    state.words = shuffle([...allWords]);
+    state.currentIndex = 0;
   }
 
   const word = state.words[state.currentIndex];
   state.scrambled = scrambleWord(word.word);
   state.hintRevealed = false;
-  state.timeLeft = ROUND_TIME[state.difficulty];
 
   gameScrambled.textContent = state.scrambled.toUpperCase();
   gameScrambled.classList.remove('correct-flash', 'wrong-flash');
@@ -125,35 +183,40 @@ function loadWord() {
   gameFeedback.className = 'feedback';
 
   updateUI();
-  startTimer();
 }
 
-function startTimer() {
+function startCountdown() {
   if (state.timerInterval) clearInterval(state.timerInterval);
 
-  const total = ROUND_TIME[state.difficulty];
-  timerFill.style.transition = 'none';
-  timerFill.style.width = '100%';
-  void timerFill.offsetWidth;
-  timerFill.style.transition = `width 1s linear`;
+  const total = state.timeMode;
+  countdownFill.style.transition = 'none';
+  countdownFill.style.width = '100%';
+  void countdownFill.offsetWidth;
+  countdownFill.style.transition = 'width 1s linear';
 
   state.timerInterval = window.setInterval(() => {
     state.timeLeft--;
     const pct = (state.timeLeft / total) * 100;
-    timerFill.style.width = `${pct}%`;
+    countdownFill.style.width = `${pct}%`;
 
-    if (state.timeLeft <= 5) {
-      timerFill.classList.add('timer-danger');
+    if (state.timeLeft <= 10) {
+      countdownFill.classList.add('timer-danger');
     } else {
-      timerFill.classList.remove('timer-danger');
+      countdownFill.classList.remove('timer-danger');
     }
 
-    gameTimer.textContent = `${state.timeLeft}s`;
+    const mins = Math.floor(state.timeLeft / 60);
+    const secs = state.timeLeft % 60;
+    gameCountdown.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 
     if (state.timeLeft <= 0) {
-      handleTimeout();
+      endGame();
     }
   }, 1000);
+
+  const mins = Math.floor(state.timeLeft / 60);
+  const secs = state.timeLeft % 60;
+  gameCountdown.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 function stopTimer() {
@@ -163,25 +226,6 @@ function stopTimer() {
   }
 }
 
-function handleTimeout() {
-  stopTimer();
-  state.lives--;
-  state.streak = 0;
-  const word = state.words[state.currentIndex];
-
-  gameInput.disabled = true;
-  gameFeedback.textContent = `Time's up! The word was "${word.word}"`;
-  gameFeedback.className = 'feedback feedback-wrong';
-  gameScrambled.classList.add('wrong-flash');
-
-  updateUI();
-
-  setTimeout(() => {
-    state.currentIndex++;
-    loadWord();
-  }, 2000);
-}
-
 function checkAnswer() {
   const guess = gameInput.value.trim().toLowerCase();
   const word = state.words[state.currentIndex];
@@ -189,22 +233,21 @@ function checkAnswer() {
   if (!guess) return;
 
   if (guess === word.word.toLowerCase()) {
-    stopTimer();
-    const timeBonus = state.timeLeft * 10;
-    const streakMultiplier = 1 + Math.floor(state.streak / 3) * 0.5;
-    const points = Math.round((100 + timeBonus) * streakMultiplier);
+    const streakMultiplier = 1 + Math.floor(state.streak / 3) * 0.25;
+    const points = Math.round(word.points * streakMultiplier);
 
     state.score += points;
     state.streak++;
+    state.wordsCompleted++;
     if (state.streak > state.bestStreak) state.bestStreak = state.streak;
 
     gameInput.disabled = true;
-    gameFeedback.textContent = `+${points} points!`;
+    gameFeedback.textContent = `+${points}`;
     gameFeedback.className = 'feedback feedback-correct';
     gameScrambled.classList.add('correct-flash');
 
     if (state.streak > 0 && state.streak % 3 === 0) {
-      gameFeedback.textContent += ` ${streakMultiplier + 0.5}x streak!`;
+      gameFeedback.textContent += ` (${streakMultiplier + 0.25}x)`;
     }
 
     updateUI();
@@ -212,7 +255,7 @@ function checkAnswer() {
     setTimeout(() => {
       state.currentIndex++;
       loadWord();
-    }, 1200);
+    }, 600);
   } else {
     gameInput.classList.add('input-shake');
     setTimeout(() => gameInput.classList.remove('input-shake'), 400);
@@ -226,18 +269,14 @@ function revealHint() {
   gameHint.textContent = word.hint;
   gameHint.classList.remove('hidden');
   btnHint.classList.add('hidden');
-  state.score = Math.max(0, state.score - 25);
-  updateUI();
 }
 
 function skipWord() {
-  stopTimer();
-  state.lives--;
   state.streak = 0;
   const word = state.words[state.currentIndex];
 
   gameInput.disabled = true;
-  gameFeedback.textContent = `Skipped! The word was "${word.word}"`;
+  gameFeedback.textContent = word.word;
   gameFeedback.className = 'feedback feedback-skip';
   gameScrambled.classList.add('wrong-flash');
 
@@ -246,52 +285,50 @@ function skipWord() {
   setTimeout(() => {
     state.currentIndex++;
     loadWord();
-  }, 1800);
+  }, 800);
 }
 
 function updateUI() {
   gameScore.textContent = `${state.score}`;
   gameStreak.textContent = `${state.streak}`;
-  gameTimer.textContent = `${state.timeLeft}s`;
-  gameProgress.textContent = `${state.currentIndex + 1} / ${state.words.length}`;
-
-  let hearts = '';
-  for (let i = 0; i < state.maxLives; i++) {
-    hearts += i < state.lives ? '<span class="life life-full"></span>' : '<span class="life life-empty"></span>';
-  }
-  gameLives.innerHTML = hearts;
+  gameWords.textContent = `${state.wordsCompleted}`;
 }
 
 function endGame() {
   stopTimer();
-  state.gameOver = true;
   showScreen(screenOver);
 
-  const wordsCompleted = state.currentIndex;
-  const totalWords = state.words.length;
+  const entry: LeaderboardEntry = {
+    score: state.score,
+    words: state.wordsCompleted,
+    streak: state.bestStreak,
+    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+  };
 
-  if (state.lives <= 0) {
-    overTitle.textContent = 'Game Over';
-  } else {
-    overTitle.textContent = 'All Words Complete!';
-  }
+  const prevScores = getScores(state.timeMode);
+  const prevBest = prevScores.length > 0 ? prevScores[0].score : 0;
+  const isNewBest = state.score > prevBest && state.score > 0;
 
+  addScore(state.timeMode, entry);
+
+  overTitle.textContent = isNewBest ? 'New Record!' : 'Time\'s Up!';
   overScore.textContent = `${state.score}`;
   overStreak.textContent = `${state.bestStreak}`;
-  overWordsCompleted.textContent = `${wordsCompleted} / ${totalWords}`;
+  overWordsCount.textContent = `${state.wordsCompleted}`;
+  overNewBest.classList.toggle('hidden', !isNewBest);
 
-  const missed: string[] = [];
-  for (let i = Math.max(0, state.currentIndex - 5); i <= state.currentIndex && i < state.words.length; i++) {
-    missed.push(state.words[i].word);
-  }
-
-  overWords.innerHTML = '';
-  const recentWords = state.words.slice(0, state.currentIndex);
-  recentWords.forEach(w => {
-    const li = document.createElement('li');
-    li.textContent = w.word;
-    overWords.appendChild(li);
-  });
+  const scores = getScores(state.timeMode);
+  overLbList.innerHTML = scores.map((s, i) => {
+    const isCurrent = s.score === state.score && s.words === state.wordsCompleted && s.date === entry.date;
+    return `
+      <li class="lb-entry ${i === 0 ? 'lb-gold' : ''} ${isCurrent ? 'lb-current' : ''}">
+        <span class="lb-rank">${i + 1}</span>
+        <span class="lb-score">${s.score}</span>
+        <span class="lb-detail">${s.words} words</span>
+        <span class="lb-date">${s.date}</span>
+      </li>
+    `;
+  }).join('');
 }
 
 gameInput.addEventListener('keydown', (e) => {
@@ -301,7 +338,18 @@ gameInput.addEventListener('keydown', (e) => {
 btnHint.addEventListener('click', revealHint);
 btnSkip.addEventListener('click', skipWord);
 
-btnEasy.addEventListener('click', () => startGame('easy'));
-btnMedium.addEventListener('click', () => startGame('medium'));
-btnHard.addEventListener('click', () => startGame('hard'));
-btnPlayAgain.addEventListener('click', () => showScreen(screenHome));
+btn60.addEventListener('click', () => startGame(60));
+btn90.addEventListener('click', () => startGame(90));
+btn120.addEventListener('click', () => startGame(120));
+btnPlayAgain.addEventListener('click', () => {
+  renderHomeLb(activeLbTab);
+  showScreen(screenHome);
+});
+
+homeTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    renderHomeLb(Number(tab.dataset.mode) as TimeMode);
+  });
+});
+
+renderHomeLb(60);

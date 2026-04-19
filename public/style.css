@@ -22,7 +22,7 @@ body {
 }
 
 .page {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 3rem 1.5rem 2rem;
 }
@@ -50,7 +50,7 @@ body {
 
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
 }
 

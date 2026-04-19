@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google-site-verification" content="hhgX0SZwfAKQzpysbYV3tpVmjr7wh5k8uSdwOhWxpu0" />
-  <title>Word Scramble</title>
+  <title>Gramble</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="/consent.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -32,25 +32,35 @@
 <div id="screen-home" class="screen">
   <div class="card home-card">
     <div class="home-icon">&#x1F331;</div>
-    <h1 class="title">Word<br/>Scramble</h1>
-    <p class="subtitle">Unscramble the letters. Find your zen.</p>
+    <h1 class="title">Gramble</h1>
+    <p class="subtitle">Unscramble words against the clock</p>
 
-    <div class="difficulty-section">
-      <p class="diff-label">Choose your pace</p>
-      <div class="diff-buttons">
-        <button id="btn-easy" class="btn btn-diff btn-easy">
-          <span class="diff-name">Easy</span>
-          <span class="diff-desc">4-5 letters, 25s</span>
+    <div class="time-section">
+      <p class="section-label">Pick your timer</p>
+      <div class="time-buttons">
+        <button id="btn-60" class="btn btn-time">
+          <span class="time-val">1:00</span>
+          <span class="time-label">Sprint</span>
         </button>
-        <button id="btn-medium" class="btn btn-diff btn-medium">
-          <span class="diff-name">Medium</span>
-          <span class="diff-desc">5-7 letters, 20s</span>
+        <button id="btn-90" class="btn btn-time">
+          <span class="time-val">1:30</span>
+          <span class="time-label">Flow</span>
         </button>
-        <button id="btn-hard" class="btn btn-diff btn-hard">
-          <span class="diff-name">Hard</span>
-          <span class="diff-desc">7-9 letters, 18s</span>
+        <button id="btn-120" class="btn btn-time">
+          <span class="time-val">2:00</span>
+          <span class="time-label">Zen</span>
         </button>
       </div>
+    </div>
+
+    <div class="lb-section">
+      <div class="lb-tabs">
+        <button class="lb-tab active" data-mode="60">1 min</button>
+        <button class="lb-tab" data-mode="90">1:30</button>
+        <button class="lb-tab" data-mode="120">2 min</button>
+      </div>
+      <ol id="home-lb-list" class="lb-list"></ol>
+      <p id="home-lb-empty" class="lb-empty">No scores yet. Play a round!</p>
     </div>
   </div>
 </div>
@@ -64,22 +74,23 @@
         <span id="game-score" class="stat-value">0</span>
       </div>
       <div class="stat">
+        <span class="stat-label">Words</span>
+        <span id="game-words" class="stat-value">0</span>
+      </div>
+      <div class="stat">
         <span class="stat-label">Streak</span>
         <span id="game-streak" class="stat-value">0</span>
       </div>
-      <div id="game-lives" class="lives"></div>
     </div>
 
-    <span id="game-progress" class="progress-badge">1 / 40</span>
+    <div class="countdown-bar">
+      <div id="countdown-fill" class="countdown-fill"></div>
+    </div>
+    <span id="game-countdown" class="countdown-text">1:00</span>
 
     <div class="scramble-area">
       <p id="game-scrambled" class="scrambled-word"></p>
     </div>
-
-    <div class="timer-bar">
-      <div id="timer-fill" class="timer-fill"></div>
-    </div>
-    <span id="game-timer" class="timer-text">20s</span>
 
     <div class="input-row">
       <input id="game-input" type="text" class="game-input" placeholder="Type your answer..." autocomplete="off" autocapitalize="off" spellcheck="false" />
@@ -87,12 +98,11 @@
 
     <div id="game-feedback" class="feedback"></div>
 
-    <div class="hint-row">
-      <button id="btn-hint" class="btn btn-hint">Reveal Hint (-25pts)</button>
+    <div class="action-row">
+      <button id="btn-hint" class="btn btn-hint">Hint</button>
       <p id="game-hint" class="hint-text hidden"></p>
+      <button id="btn-skip" class="btn btn-skip">Skip</button>
     </div>
-
-    <button id="btn-skip" class="btn btn-skip">Skip Word</button>
   </div>
 </div>
 
@@ -100,26 +110,27 @@
 <div id="screen-over" class="screen hidden">
   <div class="card over-card">
     <div class="home-icon">&#x1F33B;</div>
-    <h2 id="over-title" class="screen-title">Game Over</h2>
+    <h2 id="over-title" class="screen-title">Time's Up!</h2>
+    <p id="over-new-best" class="new-best hidden">New Personal Best!</p>
 
     <div class="over-stats">
       <div class="over-stat">
         <span class="over-stat-value" id="over-score">0</span>
-        <span class="over-stat-label">Final Score</span>
+        <span class="over-stat-label">Score</span>
+      </div>
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-words-count">0</span>
+        <span class="over-stat-label">Words</span>
       </div>
       <div class="over-stat">
         <span class="over-stat-value" id="over-streak">0</span>
         <span class="over-stat-label">Best Streak</span>
       </div>
-      <div class="over-stat">
-        <span class="over-stat-value" id="over-words-completed">0</span>
-        <span class="over-stat-label">Words</span>
-      </div>
     </div>
 
-    <div class="words-solved">
-      <h3>Words Solved</h3>
-      <ul id="over-words" class="word-list"></ul>
+    <div class="lb-section lb-section-over">
+      <h3 class="lb-heading">Leaderboard</h3>
+      <ol id="over-lb-list" class="lb-list"></ol>
     </div>
 
     <button id="btn-play-again" class="btn btn-primary">Play Again</button>
