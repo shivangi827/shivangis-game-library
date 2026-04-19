@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Never Have I Ever</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/consent.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -156,7 +157,30 @@
     </div>
   </div>
 
+  <div id="modal-terms" class="terms-overlay hidden" role="dialog" aria-modal="true">
+    <div class="terms-box">
+      <h2>Terms of Use</h2>
+      <div class="terms-body">
+        <p>Shivangi's Game Library is a free collection of party games. By using it you agree to the following:</p>
+        <ul>
+          <li>This site uses <strong>Microsoft Clarity</strong> to collect anonymous analytics and session replays (page views, clicks, mouse movement, navigation). Clarity sets cookies in your browser.</li>
+          <li>We do not sell your data or share it outside of Clarity.</li>
+          <li>Names you enter in rooms are visible to other players in the same room until the room is closed.</li>
+          <li>The games are provided as-is with no warranty.</li>
+          <li>Don't use the site to harass others or abuse the service.</li>
+        </ul>
+      </div>
+      <button class="terms-btn terms-btn-accept" id="btn-terms-accept">I Agree &amp; Play</button>
+      <button class="terms-btn terms-btn-close hidden" id="btn-terms-close">Close</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <a href="#" id="footer-terms">Terms</a>
+  </footer>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="app.js"></script>
+  <script src="/consent.js"></script>
 </body>
 </html>
