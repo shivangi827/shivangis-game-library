@@ -15,6 +15,7 @@
     "dev": "concurrently \"tsc -p tsconfig.server.json --watch\" \"npm run build:imposter -- --watch\" \"npm run build:vibe-check -- --watch\" \"npm run build:never-have-i-ever -- --watch\" \"nodemon dist/server.js\""
   },
   "dependencies": {
+    "@libsql/client": "^0.17.2",
     "express": "^4.21.0",
     "google-auth-library": "^10.6.2",
     "google-spreadsheet": "^5.2.0",

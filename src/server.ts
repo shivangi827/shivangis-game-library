@@ -7,6 +7,8 @@ import { setupVibeCheck } from './games/vibe-check/server';
 import { setupNeverHaveIEver } from './games/never-have-i-ever/server';
 import { setupZombieSurvival } from './games/zombie-survival/server';
 import { getScores, addScore, isConfigured, ScoreEntry } from './games/word-scramble/sheets';
+import { addFeedback, FeedbackEntry } from './feedback-sheets';
+import { sendFeedbackEmail } from './feedback-email';
 
 const app = express();
 const server = http.createServer(app);
@@ -65,6 +67,25 @@ app.post('/api/gramble/scores', express.json(), async (req, res) => {
     streak: Math.max(0, Math.round(streak)),
     date: String(date).slice(0, 20),
   });
+  res.json({ ok });
+});
+
+app.post('/api/feedback', express.json(), async (req, res) => {
+  const { rating, message, page } = req.body as Partial<FeedbackEntry>;
+  if (!rating || rating < 1 || rating > 5) {
+    res.status(400).json({ error: 'Rating must be 1-5' });
+    return;
+  }
+  const entry: FeedbackEntry = {
+    rating: Math.round(rating),
+    message: String(message || '').slice(0, 1000).trim(),
+    page: String(page || '').slice(0, 100),
+    date: new Date().toISOString(),
+  };
+  const [ok] = await Promise.all([
+    addFeedback(entry),
+    sendFeedbackEmail(entry),
+  ]);
   res.json({ ok });
 });
 
