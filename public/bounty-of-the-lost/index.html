@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bounty of the Lost</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/consent.css" />
+  <link rel="stylesheet" href="/feedback.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="floating-bg" aria-hidden="true">
+  <span class="floater" style="left:5%;animation-duration:22s;animation-delay:0s;font-size:1.2rem;opacity:0.15">&#x2728;</span>
+  <span class="floater" style="left:15%;animation-duration:18s;animation-delay:3s;font-size:1rem;opacity:0.1">&#x1F480;</span>
+  <span class="floater" style="left:30%;animation-duration:25s;animation-delay:7s;font-size:1.4rem;opacity:0.12">&#x2728;</span>
+  <span class="floater" style="left:50%;animation-duration:20s;animation-delay:1s;font-size:1rem;opacity:0.08">&#x1F480;</span>
+  <span class="floater" style="left:70%;animation-duration:23s;animation-delay:5s;font-size:1.3rem;opacity:0.1">&#x2728;</span>
+  <span class="floater" style="left:85%;animation-duration:19s;animation-delay:9s;font-size:1.1rem;opacity:0.12">&#x1F480;</span>
+</div>
+
+<div class="vignette" id="vignette"></div>
+
+<!-- Title Screen -->
+<div id="screen-title" class="screen">
+  <div class="card title-card">
+    <div class="title-icon">&#x1F48E;</div>
+    <h1 class="game-title">Bounty of the Lost</h1>
+    <p class="game-subtitle">Explore. Collect. Escape alive.</p>
+
+    <div class="daily-info" id="daily-info">
+      <span class="daily-date" id="daily-date"></span>
+      <span class="daily-modifier" id="daily-modifier"></span>
+    </div>
+
+    <div id="prev-run" class="prev-run hidden"></div>
+
+    <div class="streak-display" id="streak-display"></div>
+
+    <button id="btn-enter" class="btn btn-primary">Enter the Dungeon</button>
+
+    <div class="how-section">
+      <h3>How to Play</h3>
+      <ul class="how-list">
+        <li>Click adjacent tiles to explore the dungeon</li>
+        <li>Find and collect <strong>3 Soul Shards</strong> guarded by powerful enemies</li>
+        <li>Numbers on tiles show nearby enemies (like Minesweeper)</li>
+        <li>Each shard makes escape harder &mdash; your vision darkens and you take damage moving</li>
+        <li>Return to the center <strong>Hub</strong> to extract with your shards</li>
+        <li>New dungeon every day &mdash; same layout for everyone!</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Game Screen -->
+<div id="screen-game" class="screen hidden">
+  <div class="hud">
+    <div class="hud-stat">
+      <span class="hud-icon">&#x2764;&#xFE0F;</span>
+      <span id="hud-hp" class="hud-value">20/20</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-icon">&#x1F48E;</span>
+      <span id="hud-shards" class="hud-value">0/3</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-icon">&#x1FA99;</span>
+      <span id="hud-gold" class="hud-value">0</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-icon">&#x1F441;</span>
+      <span id="hud-vision" class="hud-value">2</span>
+    </div>
+  </div>
+
+  <div class="grid-container">
+    <div id="dungeon-grid" class="dungeon-grid"></div>
+  </div>
+
+  <div id="game-log" class="game-log">
+    <p>You enter the dungeon...</p>
+  </div>
+
+  <!-- Combat Overlay -->
+  <div id="combat-overlay" class="overlay hidden">
+    <div class="overlay-box combat-box">
+      <div class="combat-enemy">
+        <span class="combat-enemy-icon" id="combat-enemy-icon"></span>
+        <h3 id="combat-enemy-name"></h3>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar" id="combat-enemy-hp"></div>
+        </div>
+        <span class="hp-text" id="combat-enemy-hp-text"></span>
+      </div>
+      <div id="combat-log" class="combat-log"></div>
+      <div class="combat-dice" id="combat-dice"></div>
+      <div class="combat-actions" id="combat-actions">
+        <button id="btn-attack" class="btn btn-danger">Attack</button>
+        <button id="btn-flee" class="btn btn-ghost">Flee</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trap Overlay -->
+  <div id="trap-overlay" class="overlay hidden">
+    <div class="overlay-box trap-box">
+      <span class="trap-icon" id="trap-icon"></span>
+      <h3 id="trap-name"></h3>
+      <p id="trap-desc"></p>
+      <p class="trap-dc">Disarm DC: <strong id="trap-dc"></strong></p>
+      <div class="combat-dice" id="trap-dice"></div>
+      <div class="combat-actions" id="trap-actions">
+        <button id="btn-disarm" class="btn btn-primary">Disarm (Roll d20)</button>
+        <button id="btn-take-damage" class="btn btn-ghost">Take the hit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Treasure Overlay -->
+  <div id="treasure-overlay" class="overlay hidden">
+    <div class="overlay-box treasure-box">
+      <span class="treasure-icon" id="treasure-icon"></span>
+      <h3 id="treasure-desc"></h3>
+      <p id="treasure-details"></p>
+      <button id="btn-loot" class="btn btn-gold">Collect</button>
+    </div>
+  </div>
+
+  <!-- Shard Overlay -->
+  <div id="shard-overlay" class="overlay hidden">
+    <div class="overlay-box shard-box">
+      <div class="shard-glow">&#x1F48E;</div>
+      <h3>Soul Shard Collected!</h3>
+      <p id="shard-debuff-text"></p>
+      <p id="shard-count-text"></p>
+      <button id="btn-shard-continue" class="btn btn-primary">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- Victory Screen -->
+<div id="screen-victory" class="screen hidden">
+  <div class="card result-card victory-card">
+    <div class="result-icon">&#x1F3C6;</div>
+    <h2>Extraction Successful!</h2>
+    <p id="victory-shards" class="result-highlight"></p>
+
+    <div class="result-stats">
+      <div class="result-stat"><span class="stat-val" id="v-shards">0</span><span class="stat-lbl">Shards</span></div>
+      <div class="result-stat"><span class="stat-val" id="v-gold">0</span><span class="stat-lbl">Gold</span></div>
+      <div class="result-stat"><span class="stat-val" id="v-rooms">0</span><span class="stat-lbl">Rooms</span></div>
+      <div class="result-stat"><span class="stat-val" id="v-enemies">0</span><span class="stat-lbl">Defeated</span></div>
+      <div class="result-stat"><span class="stat-val" id="v-time">0:00</span><span class="stat-lbl">Time</span></div>
+    </div>
+
+    <p id="v-perfect" class="perfect-clear hidden">PERFECT CLEAR</p>
+
+    <button id="btn-back-title" class="btn btn-primary">Back to Title</button>
+  </div>
+</div>
+
+<!-- Defeat Screen -->
+<div id="screen-defeat" class="screen hidden">
+  <div class="card result-card defeat-card">
+    <div class="result-icon">&#x1F480;</div>
+    <h2>You Perished</h2>
+    <p class="defeat-flavor">The dungeon claims another soul...</p>
+
+    <div class="result-stats">
+      <div class="result-stat"><span class="stat-val" id="d-shards">0</span><span class="stat-lbl">Shards</span></div>
+      <div class="result-stat"><span class="stat-val" id="d-gold">0</span><span class="stat-lbl">Gold</span></div>
+      <div class="result-stat"><span class="stat-val" id="d-rooms">0</span><span class="stat-lbl">Rooms</span></div>
+      <div class="result-stat"><span class="stat-val" id="d-enemies">0</span><span class="stat-lbl">Defeated</span></div>
+    </div>
+
+    <button id="btn-back-title-d" class="btn btn-primary">Back to Title</button>
+  </div>
+</div>
+
+<div id="modal-terms" class="terms-overlay hidden" role="dialog" aria-modal="true">
+  <div class="terms-box">
+    <h2>Terms of Use</h2>
+    <div class="terms-body">
+      <p>Shivangi's Game Library is a free collection of party games. By using it you agree to the following:</p>
+      <ul>
+        <li>This site uses <strong>Microsoft Clarity</strong> to collect anonymous analytics and session replays.</li>
+        <li>We do not sell your data or share it outside of Clarity.</li>
+        <li>The games are provided as-is with no warranty.</li>
+      </ul>
+    </div>
+    <button class="terms-btn terms-btn-accept" id="btn-terms-accept">I Agree &amp; Play</button>
+    <button class="terms-btn terms-btn-close hidden" id="btn-terms-close">Close</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <a href="#" id="footer-terms">Terms</a>
+</footer>
+
+<script src="app.js"></script>
+<script src="/feedback.js"></script>
+<script src="/consent.js"></script>
+</body>
+</html>
