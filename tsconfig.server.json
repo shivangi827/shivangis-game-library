@@ -13,6 +13,6 @@
     "declaration": false,
     "sourceMap": true
   },
-  "include": ["src/server.ts", "src/feedback-sheets.ts", "src/feedback-email.ts", "src/games/**/shared/*.ts", "src/games/**/server.ts", "src/games/**/sheets.ts"],
+  "include": ["src/server.ts", "src/db.ts", "src/feedback-sheets.ts", "src/feedback-email.ts", "src/games/**/shared/*.ts", "src/games/**/server.ts", "src/games/**/sheets.ts"],
   "exclude": ["src/games/**/client"]
 }
