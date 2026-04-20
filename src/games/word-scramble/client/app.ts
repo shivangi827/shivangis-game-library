@@ -8,8 +8,6 @@ interface LeaderboardEntry {
   date: string;
 }
 
-type Leaderboard = Record<string, LeaderboardEntry[]>;
-
 interface GameState {
   timeMode: TimeMode;
   words: Word[];
@@ -27,6 +25,84 @@ interface GameState {
 const STORAGE_KEY = 'gramble.leaderboard';
 const NAME_KEY = 'gramble.name';
 const MAX_ENTRIES = 10;
+let useApi = false;
+
+async function checkApi() {
+  try {
+    const res = await fetch('/api/gramble/configured');
+    const data = await res.json();
+    useApi = data.configured === true;
+  } catch {
+    useApi = false;
+  }
+}
+
+async function fetchScores(timeMode: TimeMode): Promise<LeaderboardEntry[]> {
+  if (!useApi) return getLocalScores(timeMode);
+
+  try {
+    const res = await fetch(`/api/gramble/scores/${timeMode}`);
+    if (!res.ok) return getLocalScores(timeMode);
+    const scores: LeaderboardEntry[] = await res.json();
+    cacheScores(timeMode, scores);
+    return scores;
+  } catch {
+    return getLocalScores(timeMode);
+  }
+}
+
+async function submitScore(timeMode: TimeMode, entry: LeaderboardEntry): Promise<void> {
+  addLocalScore(timeMode, entry);
+
+  if (!useApi) return;
+
+  try {
+    await fetch('/api/gramble/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ timeMode, ...entry }),
+    });
+  } catch { /* score saved locally at least */ }
+}
+
+function getLocalScores(timeMode: TimeMode): LeaderboardEntry[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const lb = JSON.parse(raw);
+      return lb[String(timeMode)] || [];
+    }
+  } catch { /* ignore */ }
+  return [];
+}
+
+function addLocalScore(timeMode: TimeMode, entry: LeaderboardEntry) {
+  let lb: Record<string, LeaderboardEntry[]>;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    lb = raw ? JSON.parse(raw) : {};
+  } catch {
+    lb = {};
+  }
+  const key = String(timeMode);
+  if (!lb[key]) lb[key] = [];
+  lb[key].push(entry);
+  lb[key].sort((a, b) => b.score - a.score);
+  lb[key] = lb[key].slice(0, MAX_ENTRIES);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+}
+
+function cacheScores(timeMode: TimeMode, scores: LeaderboardEntry[]) {
+  let lb: Record<string, LeaderboardEntry[]>;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    lb = raw ? JSON.parse(raw) : {};
+  } catch {
+    lb = {};
+  }
+  lb[String(timeMode)] = scores.slice(0, MAX_ENTRIES);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+}
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -53,33 +129,6 @@ function isValidAnswer(guess: string, word: Word): boolean {
   if (lower === word.word.toLowerCase()) return true;
   if (word.alts && word.alts.some(a => a.toLowerCase() === lower)) return true;
   return false;
-}
-
-function loadLeaderboard(): Leaderboard {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch { /* ignore */ }
-  return { '60': [], '90': [], '120': [] };
-}
-
-function saveLeaderboard(lb: Leaderboard) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
-}
-
-function addScore(timeMode: TimeMode, entry: LeaderboardEntry) {
-  const lb = loadLeaderboard();
-  const key = String(timeMode);
-  if (!lb[key]) lb[key] = [];
-  lb[key].push(entry);
-  lb[key].sort((a, b) => b.score - a.score);
-  lb[key] = lb[key].slice(0, MAX_ENTRIES);
-  saveLeaderboard(lb);
-}
-
-function getScores(timeMode: TimeMode): LeaderboardEntry[] {
-  const lb = loadLeaderboard();
-  return lb[String(timeMode)] || [];
 }
 
 function getSavedName(): string {
@@ -130,7 +179,6 @@ const btnPlayAgain = $('btn-play-again');
 
 let state: GameState;
 let activeLbTab: TimeMode = 60;
-let pendingTimeMode: TimeMode = 60;
 
 function showScreen(screen: HTMLElement) {
   [screenHome, screenGame, screenOver].forEach(s => s.classList.add('hidden'));
@@ -143,13 +191,32 @@ function escapeHtml(s: string): string {
   return d.innerHTML;
 }
 
-function renderHomeLb(mode: TimeMode) {
+function renderLbEntries(target: HTMLElement, scores: LeaderboardEntry[], highlightEntry?: LeaderboardEntry) {
+  target.innerHTML = scores.map((s, i) => {
+    const isCurrent = highlightEntry &&
+      s.score === highlightEntry.score &&
+      s.words === highlightEntry.words &&
+      s.name === highlightEntry.name &&
+      s.date === highlightEntry.date;
+    return `
+      <li class="lb-entry ${i === 0 ? 'lb-gold' : ''} ${isCurrent ? 'lb-current' : ''}">
+        <span class="lb-rank">${i + 1}</span>
+        <span class="lb-name">${escapeHtml(s.name || 'Anonymous')}</span>
+        <span class="lb-score">${s.score}</span>
+        <span class="lb-detail">${s.words} words</span>
+        <span class="lb-date">${s.date}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+async function renderHomeLb(mode: TimeMode) {
   activeLbTab = mode;
   homeTabs.forEach(tab => {
     tab.classList.toggle('active', Number(tab.dataset.mode) === mode);
   });
 
-  const scores = getScores(mode);
+  const scores = await fetchScores(mode);
   if (scores.length === 0) {
     homeLbList.innerHTML = '';
     homeLbEmpty.classList.remove('hidden');
@@ -157,15 +224,7 @@ function renderHomeLb(mode: TimeMode) {
   }
 
   homeLbEmpty.classList.add('hidden');
-  homeLbList.innerHTML = scores.map((s, i) => `
-    <li class="lb-entry ${i === 0 ? 'lb-gold' : ''}">
-      <span class="lb-rank">${i + 1}</span>
-      <span class="lb-name">${escapeHtml(s.name || 'Anonymous')}</span>
-      <span class="lb-score">${s.score}</span>
-      <span class="lb-detail">${s.words} words</span>
-      <span class="lb-date">${s.date}</span>
-    </li>
-  `).join('');
+  renderLbEntries(homeLbList, scores);
 }
 
 function promptName(callback: () => void) {
@@ -215,7 +274,6 @@ function startGame(timeMode: TimeMode) {
 }
 
 function handleTimeSelect(timeMode: TimeMode) {
-  pendingTimeMode = timeMode;
   const saved = getSavedName();
   if (saved) {
     startGame(timeMode);
@@ -357,7 +415,7 @@ function updateUI() {
   gameWords.textContent = `${state.wordsCompleted}`;
 }
 
-function endGame() {
+async function endGame() {
   stopTimer();
   showScreen(screenOver);
 
@@ -371,11 +429,11 @@ function endGame() {
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
   };
 
-  const prevScores = getScores(state.timeMode);
+  const prevScores = await fetchScores(state.timeMode);
   const prevBest = prevScores.length > 0 ? prevScores[0].score : 0;
   const isNewBest = state.score > prevBest && state.score > 0;
 
-  addScore(state.timeMode, entry);
+  await submitScore(state.timeMode, entry);
 
   overTitle.textContent = isNewBest ? 'New Record!' : 'Time\'s Up!';
   overScore.textContent = `${state.score}`;
@@ -383,19 +441,8 @@ function endGame() {
   overWordsCount.textContent = `${state.wordsCompleted}`;
   overNewBest.classList.toggle('hidden', !isNewBest);
 
-  const scores = getScores(state.timeMode);
-  overLbList.innerHTML = scores.map((s, i) => {
-    const isCurrent = s.score === state.score && s.words === state.wordsCompleted && s.date === entry.date && s.name === playerName;
-    return `
-      <li class="lb-entry ${i === 0 ? 'lb-gold' : ''} ${isCurrent ? 'lb-current' : ''}">
-        <span class="lb-rank">${i + 1}</span>
-        <span class="lb-name">${escapeHtml(s.name || 'Anonymous')}</span>
-        <span class="lb-score">${s.score}</span>
-        <span class="lb-detail">${s.words} words</span>
-        <span class="lb-date">${s.date}</span>
-      </li>
-    `;
-  }).join('');
+  const scores = await fetchScores(state.timeMode);
+  renderLbEntries(overLbList, scores, entry);
 }
 
 gameInput.addEventListener('keydown', (e) => {
@@ -419,4 +466,4 @@ homeTabs.forEach(tab => {
   });
 });
 
-renderHomeLb(60);
+checkApi().then(() => renderHomeLb(60));

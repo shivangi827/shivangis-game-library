@@ -6,6 +6,7 @@ import { setupImposter } from './games/imposter/server';
 import { setupVibeCheck } from './games/vibe-check/server';
 import { setupNeverHaveIEver } from './games/never-have-i-ever/server';
 import { setupZombieSurvival } from './games/zombie-survival/server';
+import { getScores, addScore, isConfigured, ScoreEntry } from './games/word-scramble/sheets';
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +33,39 @@ app.get('/zombie-survival', (_req, res) => {
 });
 app.get('/word-scramble', (_req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'word-scramble', 'index.html'));
+});
+
+app.get('/api/gramble/configured', async (_req, res) => {
+  const ok = await isConfigured();
+  res.json({ configured: ok });
+});
+
+app.get('/api/gramble/scores/:timeMode', async (req, res) => {
+  const timeMode = Number(req.params.timeMode);
+  if (![60, 90, 120].includes(timeMode)) {
+    res.status(400).json({ error: 'Invalid time mode' });
+    return;
+  }
+  const scores = await getScores(timeMode);
+  res.json(scores);
+});
+
+app.post('/api/gramble/scores', express.json(), async (req, res) => {
+  const { timeMode, name, score, words, streak, date } = req.body as ScoreEntry;
+  if (![60, 90, 120].includes(timeMode) || !name || typeof score !== 'number') {
+    res.status(400).json({ error: 'Invalid data' });
+    return;
+  }
+  const sanitizedName = String(name).slice(0, 20).trim();
+  const ok = await addScore({
+    timeMode,
+    name: sanitizedName,
+    score: Math.max(0, Math.round(score)),
+    words: Math.max(0, Math.round(words)),
+    streak: Math.max(0, Math.round(streak)),
+    date: String(date).slice(0, 20),
+  });
+  res.json({ ok });
 });
 
 setupImposter(io.of('/imposter'));

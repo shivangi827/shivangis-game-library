@@ -253,6 +253,33 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Music Toggle */
+.music-toggle {
+  position: fixed;
+  bottom: 2.5rem;
+  right: 1rem;
+  z-index: 50;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid #ddd;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.music-toggle:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+  box-shadow: var(--shadow-hover);
+}
+
 .footer {
   text-align: center;
   margin-top: 3rem;

@@ -113,7 +113,40 @@
     <a href="#" id="footer-terms">Terms</a>
   </footer>
 
+  <audio id="bg-music" src="music/Sugar_High_Score.mp3" loop preload="auto"></audio>
+  <button id="btn-music" class="music-toggle" title="Toggle music">&#x1F50A;</button>
+
   <script src="/consent.js"></script>
+  <script>
+  (function() {
+    var audio = document.getElementById('bg-music');
+    var btn = document.getElementById('btn-music');
+    var started = false;
+    audio.volume = 0.3;
+
+    function tryPlay() {
+      if (started) return;
+      audio.play().then(function() {
+        started = true;
+        btn.innerHTML = '&#x1F50A;';
+      }).catch(function() {});
+    }
+
+    document.addEventListener('click', tryPlay, { once: false });
+    document.addEventListener('keydown', tryPlay, { once: false });
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (audio.paused) {
+        audio.play();
+        btn.innerHTML = '&#x1F50A;';
+      } else {
+        audio.pause();
+        btn.innerHTML = '&#x1F507;';
+      }
+    });
+  })();
+  </script>
   <script>
   (function() {
     var guides = {
