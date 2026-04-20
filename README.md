@@ -1,4 +1,4 @@
-I’m a Software Engineer who enjoys gaming and is recently into making quick web games.
+I’m a Software Engineer
 
 Check it out here: https://shivangis-game-library.onrender.com/
 
