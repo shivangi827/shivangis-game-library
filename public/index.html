@@ -19,7 +19,41 @@
       <p class="subtitle">Pick a game, grab your friends, and play!</p>
     </header>
 
-    <div class="game-grid">
+    <div class="mode-toggle-row">
+      <span class="mode-label mode-label-solo active">Solo</span>
+      <button type="button" class="mode-toggle" id="mode-toggle" role="switch" aria-label="Toggle solo or party games">
+        <span class="mode-thumb"></span>
+      </button>
+      <span class="mode-label mode-label-party">Party</span>
+    </div>
+
+    <div id="grid-solo" class="game-grid">
+
+      <div class="game-card card-scramble">
+        <div class="card-icon">&#x1F331;</div>
+        <h2>Gramble</h2>
+        <p>Unscramble words against the clock. How many can you solve before time runs out?</p>
+        <span class="card-meta">Single player</span>
+        <div class="card-actions">
+          <a href="/word-scramble" class="btn-play">Play</a>
+          <button class="btn-how" data-game="gramble">How to Play</button>
+        </div>
+      </div>
+
+      <div class="game-card card-bounty">
+        <div class="card-icon">&#x1F48E;</div>
+        <h2>Bounty of the Lost</h2>
+        <p>Explore a cursed dungeon grid, collect Soul Shards, and escape alive. New dungeon every day.</p>
+        <span class="card-meta">Single player &middot; Daily</span>
+        <div class="card-actions">
+          <a href="/bounty-of-the-lost" class="btn-play">Play</a>
+          <button class="btn-how" data-game="bounty">How to Play</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="grid-party" class="game-grid hidden">
 
       <div class="game-card card-imposter">
         <img src="imposter/images/detective.png" alt="Detective cat" class="card-img" />
@@ -65,28 +99,6 @@
         </div>
       </div>
 
-      <div class="game-card card-scramble">
-        <div class="card-icon">&#x1F331;</div>
-        <h2>Gramble</h2>
-        <p>Unscramble words against the clock. How many can you solve before time runs out?</p>
-        <span class="card-meta">Single player</span>
-        <div class="card-actions">
-          <a href="/word-scramble" class="btn-play">Play</a>
-          <button class="btn-how" data-game="gramble">How to Play</button>
-        </div>
-      </div>
-
-      <div class="game-card card-bounty">
-        <div class="card-icon">&#x1F48E;</div>
-        <h2>Bounty of the Lost</h2>
-        <p>Explore a cursed dungeon grid, collect Soul Shards, and escape alive. New dungeon every day.</p>
-        <span class="card-meta">Single player &middot; Daily</span>
-        <div class="card-actions">
-          <a href="/bounty-of-the-lost" class="btn-play">Play</a>
-          <button class="btn-how" data-game="bounty">How to Play</button>
-        </div>
-      </div>
-
     </div>
 
     <footer class="footer">
@@ -128,6 +140,37 @@
   <audio id="bg-music" src="music/Sugar_High_Score.mp3" loop preload="auto"></audio>
   <button id="btn-music" class="music-toggle" title="Toggle music">&#x1F50A;</button>
 
+  <script>
+  (function() {
+    var toggle = document.getElementById('mode-toggle');
+    var solo = document.getElementById('grid-solo');
+    var party = document.getElementById('grid-party');
+    var labelSolo = document.querySelector('.mode-label-solo');
+    var labelParty = document.querySelector('.mode-label-party');
+    var isParty = false;
+
+    function apply() {
+      if (isParty) {
+        solo.classList.add('hidden');
+        party.classList.remove('hidden');
+        toggle.classList.add('toggled');
+        labelSolo.classList.remove('active');
+        labelParty.classList.add('active');
+      } else {
+        solo.classList.remove('hidden');
+        party.classList.add('hidden');
+        toggle.classList.remove('toggled');
+        labelSolo.classList.add('active');
+        labelParty.classList.remove('active');
+      }
+    }
+
+    toggle.addEventListener('click', function() {
+      isParty = !isParty;
+      apply();
+    });
+  })();
+  </script>
   <script src="/feedback.js"></script>
   <script src="/consent.js"></script>
   <script>
