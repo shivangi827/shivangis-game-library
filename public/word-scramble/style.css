@@ -537,6 +537,17 @@ body {
   color: var(--accent);
 }
 
+.btn-hint kbd, .btn-skip kbd {
+  font-family: inherit;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.1rem 0.35rem;
+  background: rgba(0,0,0,0.06);
+  border-radius: 4px;
+  margin-left: 0.2rem;
+  opacity: 0.6;
+}
+
 .btn-hint.hidden { display: none; }
 
 .hint-text {

@@ -531,8 +531,20 @@ async function endGame() {
   renderLbEntries(overLbList, scores, entry);
 }
 
+function isGameActive(): boolean {
+  return !!state && state.timerInterval !== null && !screenGame.classList.contains('hidden');
+}
+
 gameInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') checkAnswer();
+  if (e.key === 'Tab' && isGameActive()) {
+    e.preventDefault();
+    revealHint();
+  }
+  if (e.key === 'Escape' && isGameActive()) {
+    e.preventDefault();
+    skipWord();
+  }
 });
 
 btnHint.addEventListener('click', revealHint);
