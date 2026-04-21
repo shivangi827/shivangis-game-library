@@ -25,11 +25,31 @@ interface GameState {
 
 const STORAGE_KEY = 'gramble.leaderboard';
 const NAME_KEY = 'gramble.name';
+const MIGRATED_KEY = 'gramble.migrated_v2';
 const MAX_ENTRIES = 10;
+const HINT_PENALTY = 25;
 let useApi = false;
 
 let activeGameMode: GameMode = 'regular';
 let activeLbTab: TimeMode = 60;
+
+function migrateLocalScores() {
+  if (localStorage.getItem(MIGRATED_KEY)) return;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) { localStorage.setItem(MIGRATED_KEY, '1'); return; }
+    const lb = JSON.parse(raw);
+    let changed = false;
+    for (const oldKey of ['60', '90', '120']) {
+      if (lb[oldKey] && !lb[`regular-${oldKey}`]) {
+        lb[`regular-${oldKey}`] = lb[oldKey];
+        changed = true;
+      }
+    }
+    if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+  } catch { /* ignore */ }
+  localStorage.setItem(MIGRATED_KEY, '1');
+}
 
 async function checkApi() {
   try {
@@ -189,9 +209,41 @@ const btnPlayAgain = $('btn-play-again');
 
 let state: GameState;
 
+const MODE_FLOATERS: Record<GameMode, string[]> = {
+  regular: ['\u{1F343}', '\u{1F33F}', '\u{1F340}', '\u{1F343}', '\u{1F33F}', '\u{1F340}', '\u{1F343}', '\u{1F33F}', '\u{1F340}', '\u{1F343}', '\u{1F33F}', '\u{1F340}'],
+  french:  ['\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}', '\u{1F1EB}\u{1F1F7}'],
+  dev:     ['\u{1F4BB}', '\u{2328}\u{FE0F}', '\u{1F41B}', '\u{1F4BB}', '\u{2328}\u{FE0F}', '\u{1F41B}', '\u{1F4BB}', '\u{2328}\u{FE0F}', '\u{1F41B}', '\u{1F4BB}', '\u{2328}\u{FE0F}', '\u{1F41B}'],
+};
+
+const FLOATER_POSITIONS = [
+  { left: '3%',  dur: '22s', delay: '0s',  size: '1.6rem' },
+  { left: '10%', dur: '18s', delay: '4s',  size: '1.2rem' },
+  { left: '18%', dur: '26s', delay: '1s',  size: '1.8rem' },
+  { left: '26%', dur: '20s', delay: '6s',  size: '1.4rem' },
+  { left: '34%', dur: '24s', delay: '3s',  size: '2rem' },
+  { left: '42%', dur: '19s', delay: '8s',  size: '1.3rem' },
+  { left: '50%', dur: '23s', delay: '2s',  size: '1.7rem' },
+  { left: '58%', dur: '17s', delay: '5s',  size: '1.1rem' },
+  { left: '66%', dur: '25s', delay: '0s',  size: '1.9rem' },
+  { left: '74%', dur: '21s', delay: '7s',  size: '1.5rem' },
+  { left: '82%', dur: '16s', delay: '3s',  size: '1.3rem' },
+  { left: '90%', dur: '22s', delay: '9s',  size: '1.6rem' },
+];
+
+function updateFloaters(mode: GameMode) {
+  const container = document.querySelector('.floating-bg');
+  if (!container) return;
+  const emojis = MODE_FLOATERS[mode];
+  container.innerHTML = emojis.map((emoji, i) => {
+    const p = FLOATER_POSITIONS[i];
+    return `<span class="floater" style="left:${p.left};animation-duration:${p.dur};animation-delay:${p.delay};font-size:${p.size}">${emoji}</span>`;
+  }).join('');
+}
+
 function applyModeTheme(mode: GameMode) {
   document.body.classList.remove('mode-regular', 'mode-french', 'mode-dev');
   document.body.classList.add(`mode-${mode}`);
+  updateFloaters(mode);
 }
 
 function selectMode(mode: GameMode) {
@@ -415,6 +467,12 @@ function revealHint() {
   if (state.hintRevealed) return;
   state.hintRevealed = true;
   const word = state.words[state.currentIndex];
+
+  state.score = Math.max(0, state.score - HINT_PENALTY);
+  gameFeedback.textContent = `-${HINT_PENALTY}`;
+  gameFeedback.className = 'feedback feedback-hint';
+  updateUI();
+
   gameHint.textContent = word.hint;
   gameHint.classList.remove('hidden');
   btnHint.classList.add('hidden');
@@ -501,6 +559,7 @@ modeBtns.forEach(btn => {
   });
 });
 
+migrateLocalScores();
 checkApi().then(() => {
   selectMode('regular');
 });
