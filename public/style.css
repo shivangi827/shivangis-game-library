@@ -77,6 +77,7 @@ body {
 .card-nhie:hover { border-color: #FA003F; }
 .card-zombie:hover { border-color: #39FF14; }
 .card-scramble:hover { border-color: #66BB6A; }
+.card-bounty:hover { border-color: #8B5CF6; }
 
 .card-img {
   width: 90px;
@@ -101,6 +102,7 @@ body {
 .card-nhie h2 { color: #FA003F; }
 .card-zombie h2 { color: #39FF14; }
 .card-scramble h2 { color: #2E7D32; }
+.card-bounty h2 { color: #8B5CF6; }
 
 .game-card p {
   color: var(--text-muted);
@@ -154,6 +156,7 @@ body {
 .card-nhie .btn-play { background: #FA003F; }
 .card-zombie .btn-play { background: #1a8a1a; }
 .card-scramble .btn-play { background: #2E7D32; }
+.card-bounty .btn-play { background: #6D28D9; }
 
 .btn-how {
   padding: 0.55rem 0.8rem;

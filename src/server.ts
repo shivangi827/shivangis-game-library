@@ -36,6 +36,9 @@ app.get('/zombie-survival', (_req, res) => {
 app.get('/word-scramble', (_req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'word-scramble', 'index.html'));
 });
+app.get('/bounty-of-the-lost', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'bounty-of-the-lost', 'index.html'));
+});
 
 app.get('/api/gramble/configured', async (_req, res) => {
   const ok = await isConfigured();
