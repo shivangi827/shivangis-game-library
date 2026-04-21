@@ -1,4 +1,4 @@
-import { allWords, TimeMode, Word } from '../shared/words';
+import { GameMode, TimeMode, wordsByMode, MODE_LABELS, Word } from '../shared/words';
 
 interface LeaderboardEntry {
   name: string;
@@ -9,6 +9,7 @@ interface LeaderboardEntry {
 }
 
 interface GameState {
+  gameMode: GameMode;
   timeMode: TimeMode;
   words: Word[];
   currentIndex: number;
@@ -27,6 +28,9 @@ const NAME_KEY = 'gramble.name';
 const MAX_ENTRIES = 10;
 let useApi = false;
 
+let activeGameMode: GameMode = 'regular';
+let activeLbTab: TimeMode = 60;
+
 async function checkApi() {
   try {
     const res = await fetch('/api/gramble/configured');
@@ -37,22 +41,26 @@ async function checkApi() {
   }
 }
 
-async function fetchScores(timeMode: TimeMode): Promise<LeaderboardEntry[]> {
-  if (!useApi) return getLocalScores(timeMode);
+function lbKey(gameMode: GameMode, timeMode: TimeMode): string {
+  return `${gameMode}-${timeMode}`;
+}
+
+async function fetchScores(gameMode: GameMode, timeMode: TimeMode): Promise<LeaderboardEntry[]> {
+  if (!useApi) return getLocalScores(gameMode, timeMode);
 
   try {
-    const res = await fetch(`/api/gramble/scores/${timeMode}`);
-    if (!res.ok) return getLocalScores(timeMode);
+    const res = await fetch(`/api/gramble/scores/${gameMode}/${timeMode}`);
+    if (!res.ok) return getLocalScores(gameMode, timeMode);
     const scores: LeaderboardEntry[] = await res.json();
-    cacheScores(timeMode, scores);
+    cacheScores(gameMode, timeMode, scores);
     return scores;
   } catch {
-    return getLocalScores(timeMode);
+    return getLocalScores(gameMode, timeMode);
   }
 }
 
-async function submitScore(timeMode: TimeMode, entry: LeaderboardEntry): Promise<void> {
-  addLocalScore(timeMode, entry);
+async function submitScore(gameMode: GameMode, timeMode: TimeMode, entry: LeaderboardEntry): Promise<void> {
+  addLocalScore(gameMode, timeMode, entry);
 
   if (!useApi) return;
 
@@ -60,23 +68,23 @@ async function submitScore(timeMode: TimeMode, entry: LeaderboardEntry): Promise
     await fetch('/api/gramble/scores', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ timeMode, ...entry }),
+      body: JSON.stringify({ gameMode, timeMode, ...entry }),
     });
   } catch { /* score saved locally at least */ }
 }
 
-function getLocalScores(timeMode: TimeMode): LeaderboardEntry[] {
+function getLocalScores(gameMode: GameMode, timeMode: TimeMode): LeaderboardEntry[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const lb = JSON.parse(raw);
-      return lb[String(timeMode)] || [];
+      return lb[lbKey(gameMode, timeMode)] || [];
     }
   } catch { /* ignore */ }
   return [];
 }
 
-function addLocalScore(timeMode: TimeMode, entry: LeaderboardEntry) {
+function addLocalScore(gameMode: GameMode, timeMode: TimeMode, entry: LeaderboardEntry) {
   let lb: Record<string, LeaderboardEntry[]>;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -84,7 +92,7 @@ function addLocalScore(timeMode: TimeMode, entry: LeaderboardEntry) {
   } catch {
     lb = {};
   }
-  const key = String(timeMode);
+  const key = lbKey(gameMode, timeMode);
   if (!lb[key]) lb[key] = [];
   lb[key].push(entry);
   lb[key].sort((a, b) => b.score - a.score);
@@ -92,7 +100,7 @@ function addLocalScore(timeMode: TimeMode, entry: LeaderboardEntry) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
 }
 
-function cacheScores(timeMode: TimeMode, scores: LeaderboardEntry[]) {
+function cacheScores(gameMode: GameMode, timeMode: TimeMode, scores: LeaderboardEntry[]) {
   let lb: Record<string, LeaderboardEntry[]>;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -100,7 +108,7 @@ function cacheScores(timeMode: TimeMode, scores: LeaderboardEntry[]) {
   } catch {
     lb = {};
   }
-  lb[String(timeMode)] = scores.slice(0, MAX_ENTRIES);
+  lb[lbKey(gameMode, timeMode)] = scores.slice(0, MAX_ENTRIES);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
 }
 
@@ -145,6 +153,7 @@ const screenHome = $('screen-home');
 const screenGame = $('screen-game');
 const screenOver = $('screen-over');
 
+const modeBtns = document.querySelectorAll<HTMLButtonElement>('.mode-btn');
 const btn60 = $('btn-60');
 const btn90 = $('btn-90');
 const btn120 = $('btn-120');
@@ -164,6 +173,7 @@ const gameStreak = $('game-streak');
 const gameWords = $('game-words');
 const gameFeedback = $('game-feedback');
 const btnSkip = $('btn-skip');
+const gameModeLabel = $('game-mode-label');
 
 const modalName = $('modal-name');
 const nameInput = $<HTMLInputElement>('input-name');
@@ -178,7 +188,20 @@ const overNewBest = $('over-new-best');
 const btnPlayAgain = $('btn-play-again');
 
 let state: GameState;
-let activeLbTab: TimeMode = 60;
+
+function applyModeTheme(mode: GameMode) {
+  document.body.classList.remove('mode-regular', 'mode-french', 'mode-dev');
+  document.body.classList.add(`mode-${mode}`);
+}
+
+function selectMode(mode: GameMode) {
+  activeGameMode = mode;
+  modeBtns.forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  applyModeTheme(mode);
+  renderHomeLb(activeLbTab);
+}
 
 function showScreen(screen: HTMLElement) {
   [screenHome, screenGame, screenOver].forEach(s => s.classList.add('hidden'));
@@ -216,7 +239,7 @@ async function renderHomeLb(mode: TimeMode) {
     tab.classList.toggle('active', Number(tab.dataset.mode) === mode);
   });
 
-  const scores = await fetchScores(mode);
+  const scores = await fetchScores(activeGameMode, mode);
   if (scores.length === 0) {
     homeLbList.innerHTML = '';
     homeLbEmpty.classList.remove('hidden');
@@ -254,8 +277,10 @@ function promptName(callback: () => void) {
 }
 
 function startGame(timeMode: TimeMode) {
-  const shuffled = shuffle([...allWords]);
+  const pool = wordsByMode[activeGameMode];
+  const shuffled = shuffle([...pool]);
   state = {
+    gameMode: activeGameMode,
     timeMode,
     words: shuffled,
     currentIndex: 0,
@@ -268,6 +293,8 @@ function startGame(timeMode: TimeMode) {
     scrambled: '',
     hintRevealed: false,
   };
+  applyModeTheme(activeGameMode);
+  if (gameModeLabel) gameModeLabel.textContent = MODE_LABELS[activeGameMode];
   showScreen(screenGame);
   loadWord();
   startCountdown();
@@ -283,8 +310,9 @@ function handleTimeSelect(timeMode: TimeMode) {
 }
 
 function loadWord() {
+  const pool = wordsByMode[state.gameMode];
   if (state.currentIndex >= state.words.length) {
-    state.words = shuffle([...allWords]);
+    state.words = shuffle([...pool]);
     state.currentIndex = 0;
   }
 
@@ -429,11 +457,11 @@ async function endGame() {
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
   };
 
-  const prevScores = await fetchScores(state.timeMode);
+  const prevScores = await fetchScores(state.gameMode, state.timeMode);
   const prevBest = prevScores.length > 0 ? prevScores[0].score : 0;
   const isNewBest = state.score > prevBest && state.score > 0;
 
-  await submitScore(state.timeMode, entry);
+  await submitScore(state.gameMode, state.timeMode, entry);
 
   overTitle.textContent = isNewBest ? 'New Record!' : 'Time\'s Up!';
   overScore.textContent = `${state.score}`;
@@ -441,7 +469,7 @@ async function endGame() {
   overWordsCount.textContent = `${state.wordsCompleted}`;
   overNewBest.classList.toggle('hidden', !isNewBest);
 
-  const scores = await fetchScores(state.timeMode);
+  const scores = await fetchScores(state.gameMode, state.timeMode);
   renderLbEntries(overLbList, scores, entry);
 }
 
@@ -456,6 +484,7 @@ btn60.addEventListener('click', () => handleTimeSelect(60));
 btn90.addEventListener('click', () => handleTimeSelect(90));
 btn120.addEventListener('click', () => handleTimeSelect(120));
 btnPlayAgain.addEventListener('click', () => {
+  applyModeTheme(activeGameMode);
   renderHomeLb(activeLbTab);
   showScreen(screenHome);
 });
@@ -466,4 +495,12 @@ homeTabs.forEach(tab => {
   });
 });
 
-checkApi().then(() => renderHomeLb(60));
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectMode(btn.dataset.mode as GameMode);
+  });
+});
+
+checkApi().then(() => {
+  selectMode('regular');
+});

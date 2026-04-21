@@ -5,7 +5,22 @@ export interface Word {
   alts?: string[];
 }
 
-const words: Word[] = [
+export type GameMode = 'regular' | 'french' | 'dev';
+export type TimeMode = 60 | 90 | 120;
+
+export const MODE_LABELS: Record<GameMode, string> = {
+  regular: 'Regular',
+  french: 'Fran\u00e7ais',
+  dev: 'Developer',
+};
+
+export const TIME_LABELS: Record<TimeMode, string> = {
+  60: '1 min',
+  90: '1:30',
+  120: '2 min',
+};
+
+const regularWords: Word[] = [
   // 4-letter (100 pts)
   { word: 'calm', hint: 'Peaceful and still', points: 100, alts: ['clam'] },
   { word: 'leaf', hint: 'Grows on a tree', points: 100, alts: ['flea'] },
@@ -16,7 +31,7 @@ const words: Word[] = [
   { word: 'moon', hint: 'Lights up the night', points: 100, alts: ['mono'] },
   { word: 'wind', hint: 'Moving air', points: 100 },
   { word: 'frog', hint: 'Hops on lily pads', points: 100 },
-  { word: 'nest', hint: 'A bird\'s home', points: 100, alts: ['nets', 'tens', 'sent'] },
+  { word: 'nest', hint: "A bird's home", points: 100, alts: ['nets', 'tens', 'sent'] },
   { word: 'dawn', hint: 'Start of the day', points: 100, alts: ['wand'] },
   { word: 'dusk', hint: 'End of the day', points: 100 },
   { word: 'mist', hint: 'Thin fog', points: 100, alts: ['smit'] },
@@ -47,7 +62,6 @@ const words: Word[] = [
   { word: 'veil', hint: 'Thin covering', points: 100, alts: ['evil', 'vile', 'live'] },
   { word: 'wren', hint: 'Tiny songbird', points: 100 },
   { word: 'yarn', hint: 'Thread for knitting', points: 100, alts: ['nary'] },
-
   // 5-letter (150 pts)
   { word: 'bloom', hint: 'Flower opening', points: 150 },
   { word: 'stone', hint: 'Small rock', points: 150, alts: ['notes', 'onset', 'tones'] },
@@ -85,7 +99,6 @@ const words: Word[] = [
   { word: 'unity', hint: 'Being one', points: 150 },
   { word: 'vigor', hint: 'Physical strength', points: 150 },
   { word: 'wheat', hint: 'Golden grain crop', points: 150 },
-
   // 6-letter (200 pts)
   { word: 'garden', hint: 'Where flowers grow', points: 200, alts: ['danger', 'gander'] },
   { word: 'breeze', hint: 'Gentle wind', points: 200 },
@@ -126,7 +139,6 @@ const words: Word[] = [
   { word: 'voyage', hint: 'Long journey', points: 200 },
   { word: 'wreath', hint: 'Circular decoration', points: 200 },
   { word: 'zephyr', hint: 'Soft gentle breeze', points: 200 },
-
   // 7-letter (300 pts)
   { word: 'jasmine', hint: 'Fragrant white flower', points: 300 },
   { word: 'lantern', hint: 'Portable light', points: 300 },
@@ -158,7 +170,6 @@ const words: Word[] = [
   { word: 'kestrel', hint: 'Small hovering falcon', points: 300, alts: ['skelter'] },
   { word: 'nucleus', hint: 'Center of a cell', points: 300 },
   { word: 'pilgrim', hint: 'Religious traveler', points: 300 },
-
   // 8+ letter (400 pts)
   { word: 'fragrant', hint: 'Having a pleasant smell', points: 400 },
   { word: 'lavender', hint: 'Purple calming herb', points: 400 },
@@ -192,12 +203,196 @@ const words: Word[] = [
   { word: 'reservoir', hint: 'Water storage lake', points: 400 },
 ];
 
-export const allWords = words;
+const frenchWords: Word[] = [
+  // 4-letter (100 pts)
+  { word: 'lune', hint: 'Astre de la nuit', points: 100 },
+  { word: 'chat', hint: 'Animal domestique qui ronronne', points: 100 },
+  { word: 'vent', hint: 'Mouvement de l\'air', points: 100 },
+  { word: 'fleur', hint: 'Pousse dans un jardin', points: 100 },
+  { word: 'jour', hint: 'Oppos\u00e9 de la nuit', points: 100 },
+  { word: 'pain', hint: 'Aliment de boulangerie', points: 100 },
+  { word: 'pont', hint: 'Traverse une rivi\u00e8re', points: 100 },
+  { word: 'rose', hint: 'Fleur \u00e9pineuse', points: 100 },
+  { word: 'rire', hint: 'Expression de joie', points: 100 },
+  { word: 'ciel', hint: 'Au-dessus de nos t\u00eates', points: 100 },
+  { word: 'arbre', hint: 'Grand v\u00e9g\u00e9tal en for\u00eat', points: 100 },
+  { word: 'nuit', hint: 'Quand le soleil se couche', points: 100 },
+  { word: 'pluie', hint: 'Eau qui tombe du ciel', points: 100 },
+  { word: 'reve', hint: 'Pendant le sommeil', points: 100 },
+  { word: 'lait', hint: 'Boisson blanche', points: 100 },
+  { word: 'neige', hint: 'Tombe en hiver, blanche', points: 100 },
+  { word: 'fete', hint: 'Occasion de c\u00e9l\u00e9brer', points: 100 },
+  { word: 'voix', hint: 'Ce qu\'on entend quand on parle', points: 100 },
+  { word: 'paix', hint: 'Oppos\u00e9 de la guerre', points: 100 },
+  { word: 'joie', hint: 'Sentiment de bonheur', points: 100 },
+  // 5-letter (150 pts)
+  { word: 'soleil', hint: '\u00c9toile qui nous r\u00e9chauffe', points: 150 },
+  { word: 'maison', hint: 'O\u00f9 on habite', points: 150 },
+  { word: 'nuage', hint: 'Flotte dans le ciel', points: 150 },
+  { word: 'ocean', hint: 'Grande \u00e9tendue d\'eau sal\u00e9e', points: 150 },
+  { word: 'coeur', hint: 'Organe qui bat', points: 150 },
+  { word: 'plage', hint: 'Bord de mer avec du sable', points: 150 },
+  { word: 'foret', hint: 'Beaucoup d\'arbres ensemble', points: 150 },
+  { word: 'terre', hint: 'Notre plan\u00e8te', points: 150 },
+  { word: 'herbe', hint: 'Verte sous les pieds', points: 150 },
+  { word: 'etoile', hint: 'Brille dans la nuit', points: 150 },
+  { word: 'jardin', hint: 'Espace vert pr\u00e8s de la maison', points: 150 },
+  { word: 'amour', hint: 'Sentiment profond', points: 150 },
+  { word: 'monde', hint: 'L\'ensemble de la Terre', points: 150 },
+  { word: 'livre', hint: 'On le lit', points: 150 },
+  { word: 'sable', hint: 'Grains fins sur la plage', points: 150 },
+  { word: 'perle', hint: 'Bijou de l\'hu\u00eetre', points: 150 },
+  { word: 'brise', hint: 'Vent l\u00e9ger', points: 150 },
+  { word: 'vague', hint: 'Mouvement de l\'oc\u00e9an', points: 150 },
+  { word: 'matin', hint: 'D\u00e9but de la journ\u00e9e', points: 150 },
+  { word: 'ligne', hint: 'Trait droit', points: 150 },
+  // 6-letter (200 pts)
+  { word: 'chateau', hint: 'Grande demeure historique', points: 200 },
+  { word: 'lumiere', hint: 'Oppos\u00e9 de l\'obscurit\u00e9', points: 200 },
+  { word: 'riviere', hint: 'Cours d\'eau', points: 200 },
+  { word: 'papillon', hint: 'Insecte aux ailes color\u00e9es', points: 200 },
+  { word: 'montagne', hint: 'Tr\u00e8s haute \u00e9l\u00e9vation de terrain', points: 200 },
+  { word: 'automne', hint: 'Saison des feuilles mortes', points: 200 },
+  { word: 'chanson', hint: 'Musique avec des paroles', points: 200 },
+  { word: 'fromage', hint: 'Aliment fait avec du lait', points: 200 },
+  { word: 'village', hint: 'Petite commune rurale', points: 200 },
+  { word: 'silence', hint: 'Absence de bruit', points: 200 },
+  { word: 'voyage', hint: 'D\u00e9placement lointain', points: 200 },
+  { word: 'bonheur', hint: '\u00c9tat de grande joie', points: 200 },
+  { word: 'aurore', hint: 'Lumi\u00e8re avant le lever du soleil', points: 200 },
+  { word: 'cascade', hint: 'Chute d\'eau naturelle', points: 200 },
+  { word: 'douceur', hint: 'Qualit\u00e9 de ce qui est doux', points: 200 },
+  { word: 'mystere', hint: 'Ce qui est inexplicable', points: 200 },
+  { word: 'horizon', hint: 'Ligne o\u00f9 le ciel touche la terre', points: 200 },
+  { word: 'boulange', hint: 'M\u00e9tier du pain', points: 200 },
+  { word: 'cerise', hint: 'Petit fruit rouge', points: 200 },
+  { word: 'nuance', hint: 'Variation subtile', points: 200 },
+  // 7+ letter (300 pts)
+  { word: 'merveille', hint: 'Chose extraordinaire', points: 300 },
+  { word: 'printemps', hint: 'Saison des fleurs', points: 300 },
+  { word: 'chocolat', hint: 'Douceur au cacao', points: 300 },
+  { word: 'aventure', hint: 'Exp\u00e9rience palpitante', points: 300 },
+  { word: 'harmonie', hint: 'Accord parfait', points: 300 },
+  { word: 'liberte', hint: 'Droit fondamental', points: 300 },
+  { word: 'croissant', hint: 'Viennoiserie en forme de lune', points: 300 },
+  { word: 'fontaine', hint: 'Jet d\'eau d\u00e9coratif', points: 300 },
+  { word: 'crepuscule', hint: 'Lumi\u00e8re entre jour et nuit', points: 300 },
+  { word: 'lendemain', hint: 'Le jour suivant', points: 300 },
+  { word: 'tournesol', hint: 'Fleur qui suit le soleil', points: 300 },
+  { word: 'promenade', hint: 'Marche tranquille', points: 300 },
+  { word: 'souvenirs', hint: 'Ce qu\'on garde en m\u00e9moire', points: 300 },
+  { word: 'esperance', hint: 'Sentiment d\'espoir', points: 300 },
+  { word: 'hirondelle', hint: 'Oiseau migrateur', points: 300 },
+  // 8+ letter (400 pts)
+  { word: 'magnifique', hint: 'Extr\u00eamement beau', points: 400 },
+  { word: 'boulangerie', hint: 'Boutique qui vend du pain', points: 400 },
+  { word: 'extraordinaire', hint: 'Hors du commun', points: 400 },
+  { word: 'bibliotheque', hint: 'Lieu rempli de livres', points: 400 },
+  { word: 'constellation', hint: 'Groupe d\'\u00e9toiles', points: 400 },
+];
 
-export type TimeMode = 60 | 90 | 120;
+const devWords: Word[] = [
+  // 4-letter (100 pts)
+  { word: 'bash', hint: 'Unix shell', points: 100 },
+  { word: 'node', hint: 'JavaScript runtime', points: 100 },
+  { word: 'rust', hint: 'Memory-safe language by Mozilla', points: 100 },
+  { word: 'yarn', hint: 'Package manager for JS', points: 100 },
+  { word: 'enum', hint: 'Named set of constants', points: 100 },
+  { word: 'heap', hint: 'Dynamic memory area', points: 100 },
+  { word: 'loop', hint: 'Repeated execution', points: 100 },
+  { word: 'pipe', hint: 'Passes output between commands', points: 100 },
+  { word: 'json', hint: 'Data format with curly braces', points: 100 },
+  { word: 'void', hint: 'Returns nothing', points: 100 },
+  { word: 'byte', hint: '8 bits', points: 100 },
+  { word: 'grep', hint: 'Search text patterns', points: 100 },
+  { word: 'diff', hint: 'Shows file changes', points: 100 },
+  { word: 'fork', hint: 'Copy a repo or process', points: 100 },
+  { word: 'lint', hint: 'Code style checker', points: 100 },
+  { word: 'mock', hint: 'Simulated test object', points: 100 },
+  { word: 'hash', hint: 'One-way transformation', points: 100 },
+  { word: 'slug', hint: 'URL-friendly string', points: 100 },
+  { word: 'port', hint: 'Network connection number', points: 100 },
+  { word: 'cron', hint: 'Scheduled job runner', points: 100 },
+  // 5-letter (150 pts)
+  { word: 'react', hint: 'Facebook UI library', points: 150, alts: ['crate', 'trace'] },
+  { word: 'redis', hint: 'In-memory data store', points: 150 },
+  { word: 'nginx', hint: 'Web server / reverse proxy', points: 150 },
+  { word: 'flask', hint: 'Python web microframework', points: 150 },
+  { word: 'oauth', hint: 'Authorization protocol', points: 150 },
+  { word: 'regex', hint: 'Pattern matching syntax', points: 150 },
+  { word: 'stack', hint: 'LIFO data structure', points: 150 },
+  { word: 'queue', hint: 'FIFO data structure', points: 150 },
+  { word: 'token', hint: 'Auth credential string', points: 150 },
+  { word: 'merge', hint: 'Combine git branches', points: 150 },
+  { word: 'fetch', hint: 'HTTP request API', points: 150 },
+  { word: 'async', hint: 'Non-blocking execution', points: 150 },
+  { word: 'proxy', hint: 'Intermediary server', points: 150 },
+  { word: 'tuple', hint: 'Immutable sequence', points: 150 },
+  { word: 'cache', hint: 'Stored for fast access', points: 150 },
+  { word: 'patch', hint: 'Partial update', points: 150 },
+  { word: 'stdin', hint: 'Standard input stream', points: 150 },
+  { word: 'debug', hint: 'Find and fix bugs', points: 150 },
+  { word: 'query', hint: 'Database question', points: 150 },
+  { word: 'epoch', hint: 'Unix timestamp origin', points: 150 },
+  // 6-letter (200 pts)
+  { word: 'docker', hint: 'Container platform', points: 200 },
+  { word: 'lambda', hint: 'AWS serverless functions', points: 200 },
+  { word: 'python', hint: 'Language named after a snake', points: 200 },
+  { word: 'github', hint: 'Code hosting platform', points: 200 },
+  { word: 'cursor', hint: 'Database result pointer', points: 200 },
+  { word: 'heroku', hint: 'Cloud PaaS platform', points: 200 },
+  { word: 'subnet', hint: 'Network subdivision', points: 200 },
+  { word: 'sprint', hint: 'Agile work period', points: 200 },
+  { word: 'deploy', hint: 'Ship code to production', points: 200 },
+  { word: 'bucket', hint: 'S3 storage container', points: 200 },
+  { word: 'socket', hint: 'Network communication endpoint', points: 200 },
+  { word: 'schema', hint: 'Database structure definition', points: 200 },
+  { word: 'kernel', hint: 'OS core', points: 200 },
+  { word: 'binary', hint: 'Base-2 number system', points: 200 },
+  { word: 'thread', hint: 'Unit of execution', points: 200 },
+  { word: 'module', hint: 'Code unit with exports', points: 200 },
+  { word: 'render', hint: 'Display output / cloud host', points: 200 },
+  { word: 'cursor', hint: 'Blinking text position', points: 200 },
+  { word: 'commit', hint: 'Git snapshot', points: 200 },
+  { word: 'branch', hint: 'Git parallel line of work', points: 200 },
+  // 7-letter (300 pts)
+  { word: 'terraform', hint: 'Infrastructure as code tool', points: 300 },
+  { word: 'webpack', hint: 'JavaScript module bundler', points: 300 },
+  { word: 'graphql', hint: 'Query language for APIs', points: 300 },
+  { word: 'ansible', hint: 'Config management tool', points: 300 },
+  { word: 'jenkins', hint: 'CI/CD automation server', points: 300 },
+  { word: 'mongodb', hint: 'NoSQL document database', points: 300 },
+  { word: 'fargate', hint: 'AWS serverless containers', points: 300 },
+  { word: 'dynamo', hint: 'AWS NoSQL database', points: 300 },
+  { word: 'kinesis', hint: 'AWS real-time streaming', points: 300 },
+  { word: 'boolean', hint: 'True or false type', points: 300 },
+  { word: 'runtime', hint: 'Execution environment', points: 300 },
+  { word: 'swagger', hint: 'API documentation tool', points: 300 },
+  { word: 'webhook', hint: 'HTTP callback', points: 300 },
+  { word: 'payload', hint: 'Request body data', points: 300 },
+  { word: 'gateway', hint: 'API entry point', points: 300 },
+  // 8+ letter (400 pts)
+  { word: 'kubernetes', hint: 'Container orchestration K8s', points: 400 },
+  { word: 'typescript', hint: 'Typed JavaScript superset', points: 400 },
+  { word: 'cloudfront', hint: 'AWS CDN service', points: 400 },
+  { word: 'cloudwatch', hint: 'AWS monitoring service', points: 400 },
+  { word: 'elasticache', hint: 'AWS managed Redis/Memcached', points: 400 },
+  { word: 'sagemaker', hint: 'AWS machine learning platform', points: 400 },
+  { word: 'codepipeline', hint: 'AWS CI/CD service', points: 400 },
+  { word: 'cloudformation', hint: 'AWS infra as JSON/YAML', points: 400 },
+  { word: 'middleware', hint: 'Request processing layer', points: 400 },
+  { word: 'repository', hint: 'Code storage location', points: 400 },
+  { word: 'serializer', hint: 'Object to format converter', points: 400 },
+  { word: 'encryption', hint: 'Data scrambling for security', points: 400 },
+  { word: 'microservice', hint: 'Small independent service', points: 400 },
+  { word: 'pagination', hint: 'Splitting results into pages', points: 400 },
+  { word: 'idempotent', hint: 'Same result on repeated calls', points: 400 },
+];
 
-export const TIME_LABELS: Record<TimeMode, string> = {
-  60: '1 min',
-  90: '1:30',
-  120: '2 min',
+export const wordsByMode: Record<GameMode, Word[]> = {
+  regular: regularWords,
+  french: frenchWords,
+  dev: devWords,
 };
+
+export const allWords = regularWords;

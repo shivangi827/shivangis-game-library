@@ -36,6 +36,15 @@
     <h1 class="title">Gramble</h1>
     <p class="subtitle">Unscramble words against the clock</p>
 
+    <div class="mode-section">
+      <p class="section-label">Choose your mode</p>
+      <div class="mode-buttons">
+        <button class="btn mode-btn active" data-mode="regular">Regular</button>
+        <button class="btn mode-btn" data-mode="french">Fran&#231;ais</button>
+        <button class="btn mode-btn" data-mode="dev">Developer</button>
+      </div>
+    </div>
+
     <div class="time-section">
       <p class="section-label">Pick your timer</p>
       <div class="time-buttons">
@@ -69,6 +78,7 @@
 <!-- Game -->
 <div id="screen-game" class="screen hidden">
   <div class="card game-card">
+    <p id="game-mode-label" class="game-mode-badge">Regular</p>
     <div class="game-header">
       <div class="stat">
         <span class="stat-label">Score</span>

@@ -45,24 +45,34 @@ app.get('/api/gramble/configured', async (_req, res) => {
   res.json({ configured: ok });
 });
 
-app.get('/api/gramble/scores/:timeMode', async (req, res) => {
+app.get('/api/gramble/scores/:gameMode/:timeMode', async (req, res) => {
+  const gameMode = req.params.gameMode;
   const timeMode = Number(req.params.timeMode);
+  if (!['regular', 'french', 'dev'].includes(gameMode)) {
+    res.status(400).json({ error: 'Invalid game mode' });
+    return;
+  }
   if (![60, 90, 120].includes(timeMode)) {
     res.status(400).json({ error: 'Invalid time mode' });
     return;
   }
-  const scores = await getScores(timeMode);
+  const scores = await getScores(gameMode, timeMode);
   res.json(scores);
 });
 
 app.post('/api/gramble/scores', express.json(), async (req, res) => {
-  const { timeMode, name, score, words, streak, date } = req.body as ScoreEntry;
+  const { gameMode, timeMode, name, score, words, streak, date } = req.body as ScoreEntry;
+  if (!['regular', 'french', 'dev'].includes(gameMode)) {
+    res.status(400).json({ error: 'Invalid game mode' });
+    return;
+  }
   if (![60, 90, 120].includes(timeMode) || !name || typeof score !== 'number') {
     res.status(400).json({ error: 'Invalid data' });
     return;
   }
   const sanitizedName = String(name).slice(0, 20).trim();
   const ok = await addScore({
+    gameMode,
     timeMode,
     name: sanitizedName,
     score: Math.max(0, Math.round(score)),

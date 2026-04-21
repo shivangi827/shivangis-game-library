@@ -27,7 +27,8 @@ export async function getDb(): Promise<Client | null> {
         score INTEGER NOT NULL,
         words INTEGER NOT NULL,
         streak INTEGER NOT NULL,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
+        game_mode TEXT NOT NULL DEFAULT 'regular'
       )`,
       `CREATE TABLE IF NOT EXISTS feedback (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

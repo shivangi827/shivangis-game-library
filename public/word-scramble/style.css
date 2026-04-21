@@ -121,6 +121,55 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Mode selection */
+.mode-section {
+  margin-bottom: 1.2rem;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 0.4rem;
+  background: rgba(200, 230, 201, 0.3);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.mode-btn {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.55rem 0.4rem;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+  background: var(--surface);
+  color: var(--accent-dark);
+  box-shadow: 0 2px 8px rgba(27, 94, 32, 0.12);
+}
+
+.mode-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--text);
+}
+
+/* Game mode badge */
+.game-mode-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  background: rgba(76, 175, 80, 0.1);
+  padding: 0.25rem 0.8rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
 /* Time selection */
 .time-section {
   margin-bottom: 1.5rem;
@@ -683,6 +732,253 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg-deep); border-radius: 3px; }
 
+/* ========== French Mode Theme ========== */
+body.mode-french {
+  --bg: #EEF0F8;
+  --bg-deep: #D0D5E8;
+  --surface: #F5F6FA;
+  --surface-alt: #E0E3F0;
+  --text: #1A1A4E;
+  --text-muted: #4A5080;
+  --text-light: #7E85B0;
+  --accent: #002395;
+  --accent-light: #3A6AE0;
+  --accent-dark: #001A6E;
+  --correct: #002395;
+  --wrong: #EF4135;
+  --gold: #F9A825;
+  --shadow: 0 4px 24px rgba(0, 35, 149, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 35, 149, 0.12);
+
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 35, 149, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(239, 65, 53, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(0, 35, 149, 0.03) 0%, transparent 40%);
+}
+
+body.mode-french .floater { filter: hue-rotate(200deg) saturate(0.5); opacity: 0.15; }
+
+body.mode-french .mode-btn.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 35, 149, 0.15);
+}
+
+body.mode-french .mode-buttons {
+  background: rgba(0, 35, 149, 0.06);
+}
+
+body.mode-french .card {
+  border-color: rgba(0, 35, 149, 0.1);
+}
+
+body.mode-french .btn-primary {
+  background: linear-gradient(135deg, #3A6AE0, #001A6E);
+}
+
+body.mode-french .countdown-fill {
+  background: linear-gradient(90deg, #3A6AE0, #002395);
+}
+
+body.mode-french .countdown-fill.timer-danger {
+  background: linear-gradient(90deg, #EF4135, #C62828);
+}
+
+body.mode-french .scrambled-word {
+  background: rgba(0, 35, 149, 0.05);
+  border-color: rgba(0, 35, 149, 0.2);
+}
+
+body.mode-french .btn-time {
+  border-color: rgba(0, 35, 149, 0.12);
+  background: var(--surface-alt);
+}
+
+body.mode-french .btn-time:hover {
+  background: #D0D5E8;
+  border-color: var(--accent-light);
+}
+
+body.mode-french .game-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 35, 149, 0.12);
+}
+
+body.mode-french .game-mode-badge {
+  color: #fff;
+  background: linear-gradient(90deg, #002395 0%, #002395 33%, #fff 33%, #fff 40%, #EF4135 40%, #EF4135 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border: 1px solid rgba(0, 35, 149, 0.2);
+}
+
+body.mode-french .lb-tabs {
+  background: rgba(0, 35, 149, 0.05);
+}
+
+body.mode-french .lb-tab.active {
+  color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 35, 149, 0.1);
+}
+
+body.mode-french .lb-entry {
+  background: rgba(0, 35, 149, 0.04);
+}
+
+body.mode-french .lb-gold {
+  background: rgba(249, 168, 37, 0.08);
+}
+
+body.mode-french .music-toggle {
+  border-color: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ========== Developer Mode Theme ========== */
+body.mode-dev {
+  --bg: #0F1117;
+  --bg-deep: #1A1D2E;
+  --surface: #161822;
+  --surface-alt: #1E2130;
+  --text: #E0E6F0;
+  --text-muted: #8B93A8;
+  --text-light: #5A6280;
+  --accent: #00D9FF;
+  --accent-light: #33E0FF;
+  --accent-dark: #00B8D4;
+  --correct: #00E676;
+  --wrong: #FF5252;
+  --skip: #FF9800;
+  --gold: #FFD740;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4);
+
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 217, 255, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 230, 118, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(0, 217, 255, 0.02) 0%, transparent 40%);
+}
+
+body.mode-dev .floater { filter: hue-rotate(160deg) brightness(1.5); opacity: 0.08; }
+
+body.mode-dev .card {
+  border-color: rgba(0, 217, 255, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+body.mode-dev .mode-buttons {
+  background: rgba(0, 217, 255, 0.06);
+}
+
+body.mode-dev .mode-btn.active {
+  background: var(--surface-alt);
+  color: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 217, 255, 0.15);
+}
+
+body.mode-dev .title {
+  color: var(--accent);
+}
+
+body.mode-dev .btn-primary {
+  background: linear-gradient(135deg, #00D9FF, #0088AA);
+}
+
+body.mode-dev .countdown-fill {
+  background: linear-gradient(90deg, var(--accent-light), var(--accent-dark));
+}
+
+body.mode-dev .countdown-fill.timer-danger {
+  background: linear-gradient(90deg, #FF5252, #D32F2F);
+}
+
+body.mode-dev .scrambled-word {
+  background: rgba(0, 217, 255, 0.05);
+  border-color: rgba(0, 217, 255, 0.2);
+  font-family: 'Courier New', monospace;
+}
+
+body.mode-dev .btn-time {
+  border-color: rgba(0, 217, 255, 0.12);
+  background: var(--surface-alt);
+}
+
+body.mode-dev .btn-time:hover {
+  background: #252840;
+  border-color: var(--accent);
+}
+
+body.mode-dev .game-input {
+  background: var(--surface-alt);
+  color: var(--accent);
+  border-color: rgba(0, 217, 255, 0.2);
+  font-family: 'Courier New', monospace;
+}
+
+body.mode-dev .game-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.12);
+}
+
+body.mode-dev .game-input::placeholder {
+  color: var(--text-light);
+}
+
+body.mode-dev .game-mode-badge {
+  color: var(--accent);
+  background: rgba(0, 217, 255, 0.1);
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  font-family: 'Courier New', monospace;
+}
+
+body.mode-dev .lb-tabs {
+  background: rgba(0, 217, 255, 0.05);
+}
+
+body.mode-dev .lb-tab.active {
+  background: var(--surface-alt);
+  color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 217, 255, 0.1);
+}
+
+body.mode-dev .lb-entry {
+  background: rgba(0, 217, 255, 0.04);
+}
+
+body.mode-dev .lb-gold {
+  background: rgba(255, 215, 64, 0.08);
+  border-color: rgba(255, 215, 64, 0.2);
+}
+
+body.mode-dev .music-toggle {
+  border-color: rgba(0, 217, 255, 0.3);
+  background: var(--surface);
+  color: var(--accent);
+}
+
+body.mode-dev .btn-hint, body.mode-dev .btn-skip {
+  border-color: rgba(0, 217, 255, 0.15);
+  color: var(--text-light);
+}
+
+body.mode-dev .btn-hint:hover, body.mode-dev .btn-skip:hover {
+  background: var(--surface-alt);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+body.mode-dev .hint-text {
+  background: rgba(0, 217, 255, 0.06);
+  color: var(--text-muted);
+}
+
+body.mode-dev .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.mode-dev ::-webkit-scrollbar-thumb { background: var(--surface-alt); }
+
 /* Mobile */
 @media (max-width: 500px) {
   .card { padding: 1.8rem 1.2rem; }
@@ -692,4 +988,6 @@ body {
   .game-header { gap: 1.2rem; }
   .time-buttons { gap: 0.4rem; }
   .time-val { font-size: 1.3rem; }
+  .mode-buttons { gap: 0.3rem; }
+  .mode-btn { font-size: 0.75rem; padding: 0.45rem 0.3rem; }
 }

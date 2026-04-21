@@ -1,6 +1,7 @@
 import { getDb } from '../../db';
 
 export interface ScoreEntry {
+  gameMode: string;
   timeMode: number;
   name: string;
   score: number;
@@ -9,17 +10,18 @@ export interface ScoreEntry {
   date: string;
 }
 
-export async function getScores(timeMode: number): Promise<ScoreEntry[]> {
+export async function getScores(gameMode: string, timeMode: number): Promise<ScoreEntry[]> {
   const db = await getDb();
   if (!db) return [];
 
   try {
     const result = await db.execute({
-      sql: 'SELECT time_mode, name, score, words, streak, date FROM scores WHERE time_mode = ? ORDER BY score DESC LIMIT 10',
-      args: [timeMode],
+      sql: 'SELECT game_mode, time_mode, name, score, words, streak, date FROM scores WHERE game_mode = ? AND time_mode = ? ORDER BY score DESC LIMIT 10',
+      args: [gameMode, timeMode],
     });
 
     return result.rows.map(r => ({
+      gameMode: String(r.game_mode),
       timeMode: Number(r.time_mode),
       name: String(r.name),
       score: Number(r.score),
@@ -39,8 +41,8 @@ export async function addScore(entry: ScoreEntry): Promise<boolean> {
 
   try {
     await db.execute({
-      sql: 'INSERT INTO scores (time_mode, name, score, words, streak, date) VALUES (?, ?, ?, ?, ?, ?)',
-      args: [entry.timeMode, entry.name, entry.score, entry.words, entry.streak, entry.date],
+      sql: 'INSERT INTO scores (game_mode, time_mode, name, score, words, streak, date) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      args: [entry.gameMode, entry.timeMode, entry.name, entry.score, entry.words, entry.streak, entry.date],
     });
     return true;
   } catch (err) {
