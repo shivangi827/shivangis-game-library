@@ -729,126 +729,133 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg-deep); border-radius: 3px; }
 
-/* ========== French Mode Theme (Tricolore) ========== */
+/* ========== French Mode Theme (Tricolore — soft) ========== */
 body.mode-french {
-  --bg: #F0F1F7;
-  --bg-deep: #DDE0EC;
-  --surface: #FFFFFF;
-  --surface-alt: #F0F2F8;
-  --text: #1A1A4E;
-  --text-muted: #4A5080;
-  --text-light: #8088AA;
-  --accent: #002395;
-  --accent-light: #3A6AE0;
-  --accent-dark: #001A6E;
-  --accent-red: #EF4135;
-  --correct: #2E7D32;
-  --wrong: #EF4135;
-  --gold: #F9A825;
-  --shadow: 0 4px 24px rgba(0, 35, 149, 0.08);
-  --shadow-lg: 0 12px 40px rgba(0, 35, 149, 0.12);
+  --bg: #F2F3F8;
+  --bg-deep: #E4E6F0;
+  --surface: #F9FAFC;
+  --surface-alt: #EDEEF6;
+  --text: #2B3060;
+  --text-muted: #5C6190;
+  --text-light: #9096B8;
+  --accent: #3B5FC0;
+  --accent-light: #6B8EE0;
+  --accent-dark: #2A4494;
+  --correct: #3B8A4A;
+  --wrong: #D05A55;
+  --gold: #D4A23A;
+  --shadow: 0 4px 24px rgba(43, 48, 96, 0.07);
+  --shadow-lg: 0 12px 40px rgba(43, 48, 96, 0.10);
 
   background: var(--bg);
   background-image:
-    radial-gradient(ellipse at 15% 40%, rgba(0, 35, 149, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 40%, rgba(239, 65, 53, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 80%, rgba(255, 255, 255, 0.6) 0%, transparent 50%);
+    radial-gradient(ellipse at 10% 40%, rgba(59, 95, 192, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 40%, rgba(208, 90, 85, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 85%, rgba(255, 255, 255, 0.5) 0%, transparent 45%);
 }
 
-body.mode-french .floater { opacity: 0.3; filter: none; }
+body.mode-french .floater { opacity: 0.22; filter: none; }
 
 body.mode-french .title {
-  background: linear-gradient(135deg, #002395, #EF4135);
+  background: linear-gradient(135deg, #3B5FC0, #C0605C);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-body.mode-french .mode-btn.active {
-  background: var(--surface);
-  color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0, 35, 149, 0.15);
+body.mode-french .mode-buttons {
+  background: rgba(59, 95, 192, 0.07);
 }
 
-body.mode-french .mode-buttons {
-  background: rgba(0, 35, 149, 0.06);
+body.mode-french .mode-btn.active {
+  background: var(--surface);
+  color: var(--accent-dark);
+  box-shadow: 0 2px 8px rgba(43, 48, 96, 0.1);
 }
 
 body.mode-french .card {
-  border-color: rgba(0, 35, 149, 0.08);
-  border-top: 3px solid #002395;
-  border-bottom: 3px solid #EF4135;
+  border-color: rgba(59, 95, 192, 0.08);
+  border-left: 3px solid rgba(59, 95, 192, 0.35);
+  border-right: 3px solid rgba(208, 90, 85, 0.35);
 }
 
 body.mode-french .btn-primary {
-  background: linear-gradient(135deg, #002395, #EF4135);
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
 }
 
 body.mode-french .countdown-fill {
-  background: linear-gradient(90deg, #002395 0%, #002395 30%, #FFFFFF 45%, #FFFFFF 55%, #EF4135 70%, #EF4135 100%);
+  background: linear-gradient(90deg,
+    #6B8EE0 0%, #6B8EE0 30%,
+    #E8E9F0 35%, #E8E9F0 65%,
+    #D08585 70%, #D08585 100%);
 }
 
 body.mode-french .countdown-fill.timer-danger {
-  background: linear-gradient(90deg, #EF4135, #C62828);
+  background: linear-gradient(90deg, #D05A55, #B04040);
 }
 
 body.mode-french .scrambled-word {
-  background: rgba(0, 35, 149, 0.04);
-  border-color: rgba(0, 35, 149, 0.2);
-  border-left: 3px solid #002395;
-  border-right: 3px solid #EF4135;
+  background: rgba(59, 95, 192, 0.04);
+  border-color: rgba(59, 95, 192, 0.15);
 }
 
 body.mode-french .btn-time {
-  border-color: rgba(0, 35, 149, 0.12);
+  border-color: rgba(59, 95, 192, 0.1);
   background: var(--surface-alt);
 }
 
 body.mode-french .btn-time:hover {
-  background: #E0E3F0;
+  background: #E4E6F0;
   border-color: var(--accent-light);
 }
 
 body.mode-french .game-input {
-  border-color: rgba(0, 35, 149, 0.15);
+  border-color: rgba(59, 95, 192, 0.15);
 }
 
 body.mode-french .game-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0, 35, 149, 0.12);
+  box-shadow: 0 0 0 3px rgba(59, 95, 192, 0.1);
 }
 
 body.mode-french .game-mode-badge {
-  color: #fff;
-  background: linear-gradient(90deg, #002395 0%, #002395 30%, #AAAACC 30%, #AAAACC 36%, #EF4135 36%, #EF4135 100%);
-  padding: 0.3rem 1rem;
-  border: none;
+  color: var(--accent-dark);
+  background: linear-gradient(90deg,
+    rgba(59, 95, 192, 0.1) 0%,
+    rgba(59, 95, 192, 0.1) 30%,
+    rgba(255, 255, 255, 0.6) 35%,
+    rgba(255, 255, 255, 0.6) 65%,
+    rgba(208, 90, 85, 0.1) 70%,
+    rgba(208, 90, 85, 0.1) 100%);
+  border: 1px solid rgba(59, 95, 192, 0.15);
 }
 
 body.mode-french .lb-tabs {
-  background: rgba(0, 35, 149, 0.05);
+  background: rgba(59, 95, 192, 0.05);
 }
 
 body.mode-french .lb-tab.active {
-  color: var(--accent);
-  box-shadow: 0 1px 4px rgba(0, 35, 149, 0.1);
+  background: var(--surface);
+  color: var(--accent-dark);
+  box-shadow: 0 1px 4px rgba(43, 48, 96, 0.1);
 }
 
 body.mode-french .lb-entry {
-  background: rgba(0, 35, 149, 0.04);
+  background: rgba(59, 95, 192, 0.04);
 }
 
 body.mode-french .lb-gold {
-  background: rgba(249, 168, 37, 0.08);
+  background: rgba(212, 162, 58, 0.08);
+  border: 1px solid rgba(212, 162, 58, 0.2);
 }
 
 body.mode-french .music-toggle {
-  border-color: var(--accent-light);
+  border-color: rgba(59, 95, 192, 0.2);
   color: var(--accent);
 }
 
 body.mode-french .btn-hint, body.mode-french .btn-skip {
-  border-color: rgba(0, 35, 149, 0.12);
+  border-color: rgba(59, 95, 192, 0.12);
   color: var(--text-light);
 }
 
@@ -856,6 +863,11 @@ body.mode-french .btn-hint:hover, body.mode-french .btn-skip:hover {
   background: var(--surface-alt);
   border-color: var(--accent);
   color: var(--accent);
+}
+
+body.mode-french .hint-text {
+  background: rgba(59, 95, 192, 0.05);
+  color: var(--text-muted);
 }
 
 /* ========== Developer Mode Theme ========== */
@@ -890,9 +902,7 @@ body.mode-dev .card {
   backdrop-filter: blur(12px);
 }
 
-body.mode-dev .mode-buttons {
-  background: rgba(0, 217, 255, 0.06);
-}
+body.mode-dev .mode-buttons { background: rgba(0, 217, 255, 0.06); }
 
 body.mode-dev .mode-btn.active {
   background: var(--surface-alt);
@@ -900,9 +910,7 @@ body.mode-dev .mode-btn.active {
   box-shadow: 0 2px 8px rgba(0, 217, 255, 0.15);
 }
 
-body.mode-dev .title {
-  color: var(--accent);
-}
+body.mode-dev .title { color: var(--accent); }
 
 body.mode-dev .btn-primary {
   background: linear-gradient(135deg, #00D9FF, #0088AA);
@@ -955,9 +963,7 @@ body.mode-dev .game-mode-badge {
   font-family: 'Courier New', monospace;
 }
 
-body.mode-dev .lb-tabs {
-  background: rgba(0, 217, 255, 0.05);
-}
+body.mode-dev .lb-tabs { background: rgba(0, 217, 255, 0.05); }
 
 body.mode-dev .lb-tab.active {
   background: var(--surface-alt);
@@ -965,9 +971,7 @@ body.mode-dev .lb-tab.active {
   box-shadow: 0 1px 4px rgba(0, 217, 255, 0.1);
 }
 
-body.mode-dev .lb-entry {
-  background: rgba(0, 217, 255, 0.04);
-}
+body.mode-dev .lb-entry { background: rgba(0, 217, 255, 0.04); }
 
 body.mode-dev .lb-gold {
   background: rgba(255, 215, 64, 0.08);
