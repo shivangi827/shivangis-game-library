@@ -1,7 +1,7 @@
 import { Question, Difficulty, DIFFICULTY_LABELS, DIFFICULTY_POINTS, TYPE_LABELS } from '../shared/types';
 import { questions } from '../shared/questions';
 
-type TimeMode = 60 | 90 | 120;
+type TimeMode = 120 | 180 | 300;
 
 interface LeaderboardEntry {
   name: string;
@@ -32,7 +32,7 @@ const NAME_KEY = 'codecrack.name';
 const MAX_ENTRIES = 10;
 
 let activeDifficulty: Difficulty = 'easy';
-let activeLbTab: TimeMode = 60;
+let activeLbTab: TimeMode = 120;
 let state: GameState;
 
 function shuffle<T>(arr: T[]): T[] {
@@ -94,9 +94,9 @@ const screenGame = $('screen-game');
 const screenOver = $('screen-over');
 
 const diffBtns = document.querySelectorAll<HTMLButtonElement>('.diff-btn');
-const btn60 = $('btn-60');
-const btn90 = $('btn-90');
 const btn120 = $('btn-120');
+const btn180 = $('btn-180');
+const btn300 = $('btn-300');
 
 const homeTabs = document.querySelectorAll<HTMLButtonElement>('.lb-tab');
 const homeLbList = $('home-lb-list');
@@ -368,9 +368,9 @@ document.addEventListener('keydown', (e) => {
 
 optionBtns.forEach((btn, i) => btn.addEventListener('click', () => selectOption(i)));
 
-btn60.addEventListener('click', () => handleTimeSelect(60));
-btn90.addEventListener('click', () => handleTimeSelect(90));
 btn120.addEventListener('click', () => handleTimeSelect(120));
+btn180.addEventListener('click', () => handleTimeSelect(180));
+btn300.addEventListener('click', () => handleTimeSelect(300));
 
 btnPlayAgain.addEventListener('click', () => {
   renderHomeLb(activeLbTab);
