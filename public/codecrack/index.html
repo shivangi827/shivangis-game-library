@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeCrack</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/consent.css" />
+  <link rel="stylesheet" href="/feedback.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="floating-bg" aria-hidden="true">
+  <span class="floater" style="left:3%;animation-duration:22s;animation-delay:0s;font-size:1.6rem">{</span>
+  <span class="floater" style="left:10%;animation-duration:18s;animation-delay:4s;font-size:1.2rem">}</span>
+  <span class="floater" style="left:18%;animation-duration:26s;animation-delay:1s;font-size:1.8rem">&lt;/&gt;</span>
+  <span class="floater" style="left:26%;animation-duration:20s;animation-delay:6s;font-size:1.4rem">( )</span>
+  <span class="floater" style="left:34%;animation-duration:24s;animation-delay:3s;font-size:2rem">//</span>
+  <span class="floater" style="left:42%;animation-duration:19s;animation-delay:8s;font-size:1.3rem">;</span>
+  <span class="floater" style="left:50%;animation-duration:23s;animation-delay:2s;font-size:1.7rem">=&gt;</span>
+  <span class="floater" style="left:58%;animation-duration:17s;animation-delay:5s;font-size:1.1rem">[ ]</span>
+  <span class="floater" style="left:66%;animation-duration:25s;animation-delay:0s;font-size:1.9rem">0x</span>
+  <span class="floater" style="left:74%;animation-duration:21s;animation-delay:7s;font-size:1.5rem">&amp;&amp;</span>
+  <span class="floater" style="left:82%;animation-duration:16s;animation-delay:3s;font-size:1.3rem">!=</span>
+  <span class="floater" style="left:90%;animation-duration:22s;animation-delay:9s;font-size:1.6rem">++</span>
+</div>
+
+<!-- Home -->
+<div id="screen-home" class="screen">
+  <div class="card home-card">
+    <div class="home-icon">&gt;_</div>
+    <h1 class="title">CodeCrack</h1>
+    <p class="subtitle">Crack the code. Beat the clock.</p>
+
+    <div class="diff-section">
+      <p class="section-label">Difficulty</p>
+      <div class="diff-buttons">
+        <button class="btn diff-btn active" data-diff="easy">Easy</button>
+        <button class="btn diff-btn" data-diff="medium">Medium</button>
+        <button class="btn diff-btn" data-diff="hard">Hard</button>
+      </div>
+    </div>
+
+    <div class="time-section">
+      <p class="section-label">Pick your timer</p>
+      <div class="time-buttons">
+        <button id="btn-120" class="btn btn-time">
+          <span class="time-val">2:00</span>
+          <span class="time-label">Sprint</span>
+        </button>
+        <button id="btn-180" class="btn btn-time">
+          <span class="time-val">3:00</span>
+          <span class="time-label">Flow</span>
+        </button>
+        <button id="btn-300" class="btn btn-time">
+          <span class="time-val">5:00</span>
+          <span class="time-label">Zen</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="lb-section">
+      <div class="lb-tabs">
+        <button class="lb-tab active" data-mode="60">1 min</button>
+        <button class="lb-tab" data-mode="90">1:30</button>
+        <button class="lb-tab" data-mode="120">2 min</button>
+      </div>
+      <ol id="home-lb-list" class="lb-list"></ol>
+      <p id="home-lb-empty" class="lb-empty">No scores yet. Crack some code!</p>
+    </div>
+  </div>
+</div>
+
+<!-- Game -->
+<div id="screen-game" class="screen hidden">
+  <div class="card game-card">
+    <p id="game-diff-label" class="game-diff-badge">Easy</p>
+    <div class="game-header">
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span id="game-score" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Correct</span>
+        <span id="game-correct" class="stat-value">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Streak</span>
+        <span id="game-streak" class="stat-value">0</span>
+      </div>
+    </div>
+
+    <div class="countdown-bar">
+      <div id="countdown-fill" class="countdown-fill"></div>
+    </div>
+    <span id="game-countdown" class="countdown-text">1:00</span>
+
+    <div class="question-area">
+      <span id="question-type" class="question-type type-pattern">Pattern Match</span>
+      <p id="question-prompt" class="question-prompt"></p>
+      <div id="code-block" class="code-block hidden">
+        <pre><code id="code-content"></code></pre>
+      </div>
+    </div>
+
+    <div class="options-grid">
+      <button class="option-btn"><span class="option-label">A</span><span class="option-text"></span></button>
+      <button class="option-btn"><span class="option-label">B</span><span class="option-text"></span></button>
+      <button class="option-btn"><span class="option-label">C</span><span class="option-text"></span></button>
+      <button class="option-btn"><span class="option-label">D</span><span class="option-text"></span></button>
+    </div>
+
+    <div id="explanation" class="explanation hidden"></div>
+    <p class="shortcut-hint">Press 1-4 to answer</p>
+  </div>
+</div>
+
+<!-- Game Over -->
+<div id="screen-over" class="screen hidden">
+  <div class="card over-card">
+    <div class="home-icon">&gt;_</div>
+    <h2 class="screen-title">Time's Up!</h2>
+    <p id="over-new-best" class="new-best hidden">New Personal Best!</p>
+
+    <div class="over-stats">
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-score">0</span>
+        <span class="over-stat-label">Score</span>
+      </div>
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-correct">0/0</span>
+        <span class="over-stat-label">Correct</span>
+      </div>
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-accuracy">0%</span>
+        <span class="over-stat-label">Accuracy</span>
+      </div>
+      <div class="over-stat">
+        <span class="over-stat-value" id="over-streak">0</span>
+        <span class="over-stat-label">Best Streak</span>
+      </div>
+    </div>
+
+    <div class="lb-section lb-section-over">
+      <h3 class="lb-heading">Leaderboard</h3>
+      <ol id="over-lb-list" class="lb-list"></ol>
+    </div>
+
+    <button id="btn-play-again" class="btn btn-primary">Play Again</button>
+  </div>
+</div>
+
+<!-- Name Modal -->
+<div id="modal-name" class="modal-overlay hidden">
+  <div class="card modal-card">
+    <h2 class="modal-title">What's your name?</h2>
+    <input id="input-name" type="text" class="name-input" placeholder="Enter your name" maxlength="20" autocomplete="off" />
+    <button id="btn-name-confirm" class="btn btn-primary">Let's Go</button>
+  </div>
+</div>
+
+<div id="modal-terms" class="terms-overlay hidden" role="dialog" aria-modal="true">
+  <div class="terms-box">
+    <h2>Terms of Use</h2>
+    <div class="terms-body">
+      <p>Shivangi's Game Library is a free collection of party games. By using it you agree to the following:</p>
+      <ul>
+        <li>This site uses <strong>Microsoft Clarity</strong> to collect anonymous analytics and session replays (page views, clicks, mouse movement, navigation). Clarity sets cookies in your browser.</li>
+        <li>We do not sell your data or share it outside of Clarity.</li>
+        <li>Names you enter in rooms are visible to other players in the same room until the room is closed.</li>
+        <li>The games are provided as-is with no warranty.</li>
+        <li>Don't use the site to harass others or abuse the service.</li>
+      </ul>
+    </div>
+    <button class="terms-btn terms-btn-accept" id="btn-terms-accept">I Agree &amp; Play</button>
+    <button class="terms-btn terms-btn-close hidden" id="btn-terms-close">Close</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <a href="#" id="footer-terms">Terms</a>
+</footer>
+
+<script src="app.js"></script>
+<script src="/feedback.js"></script>
+<script src="/consent.js"></script>
+</body>
+</html>
