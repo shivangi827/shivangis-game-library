@@ -30,6 +30,17 @@ export async function getDb(): Promise<Client | null> {
         date TEXT NOT NULL,
         game_mode TEXT NOT NULL DEFAULT 'regular'
       )`,
+      `CREATE TABLE IF NOT EXISTS codecrack_scores (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        difficulty TEXT NOT NULL,
+        time_mode INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        score INTEGER NOT NULL,
+        correct INTEGER NOT NULL,
+        total INTEGER NOT NULL,
+        streak INTEGER NOT NULL,
+        date TEXT NOT NULL
+      )`,
       `CREATE TABLE IF NOT EXISTS feedback (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         rating INTEGER NOT NULL,

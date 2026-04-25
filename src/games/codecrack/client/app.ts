@@ -30,6 +30,7 @@ interface GameState {
 const STORAGE_KEY = 'codecrack.leaderboard';
 const NAME_KEY = 'codecrack.name';
 const MAX_ENTRIES = 10;
+let useApi = false;
 
 let activeDifficulty: Difficulty = 'easy';
 let activeLbTab: TimeMode = 120;
@@ -85,6 +86,53 @@ function addLocalScore(diff: Difficulty, time: TimeMode, entry: LeaderboardEntry
   lb[key].sort((a, b) => b.score - a.score);
   lb[key] = lb[key].slice(0, MAX_ENTRIES);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+}
+
+function cacheScores(diff: Difficulty, time: TimeMode, scores: LeaderboardEntry[]) {
+  let lb: Record<string, LeaderboardEntry[]>;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    lb = raw ? JSON.parse(raw) : {};
+  } catch {
+    lb = {};
+  }
+  lb[lbKey(diff, time)] = scores.slice(0, MAX_ENTRIES);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(lb));
+}
+
+async function checkApi() {
+  try {
+    const res = await fetch('/api/codecrack/configured');
+    const data = await res.json();
+    useApi = data.configured === true;
+  } catch {
+    useApi = false;
+  }
+}
+
+async function fetchScores(diff: Difficulty, time: TimeMode): Promise<LeaderboardEntry[]> {
+  if (!useApi) return getLocalScores(diff, time);
+  try {
+    const res = await fetch(`/api/codecrack/scores/${diff}/${time}`);
+    if (!res.ok) return getLocalScores(diff, time);
+    const scores: LeaderboardEntry[] = await res.json();
+    cacheScores(diff, time, scores);
+    return scores;
+  } catch {
+    return getLocalScores(diff, time);
+  }
+}
+
+async function submitScore(diff: Difficulty, time: TimeMode, entry: LeaderboardEntry): Promise<void> {
+  addLocalScore(diff, time, entry);
+  if (!useApi) return;
+  try {
+    await fetch('/api/codecrack/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ difficulty: diff, timeMode: time, ...entry }),
+    });
+  } catch { /* saved locally at least */ }
 }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -162,10 +210,10 @@ function renderLbEntries(target: HTMLElement, scores: LeaderboardEntry[], highli
   }).join('');
 }
 
-function renderHomeLb(time: TimeMode) {
+async function renderHomeLb(time: TimeMode) {
   activeLbTab = time;
   homeTabs.forEach(tab => tab.classList.toggle('active', Number(tab.dataset.mode) === time));
-  const scores = getLocalScores(activeDifficulty, time);
+  const scores = await fetchScores(activeDifficulty, time);
   if (scores.length === 0) {
     homeLbList.innerHTML = '';
     homeLbEmpty.classList.remove('hidden');
@@ -314,7 +362,7 @@ function startCountdown() {
   gameCountdown.textContent = `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-function endGame() {
+async function endGame() {
   if (state.timerInterval) {
     clearInterval(state.timerInterval);
     state.timerInterval = null;
@@ -330,11 +378,11 @@ function endGame() {
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
   };
 
-  const prev = getLocalScores(state.difficulty, state.timeMode);
+  const prev = await fetchScores(state.difficulty, state.timeMode);
   const prevBest = prev.length > 0 ? prev[0].score : 0;
   const isNewBest = state.score > prevBest && state.score > 0;
 
-  addLocalScore(state.difficulty, state.timeMode, entry);
+  await submitScore(state.difficulty, state.timeMode, entry);
 
   overScore.textContent = `${state.score}`;
   overCorrect.textContent = `${state.correct}/${state.total}`;
@@ -342,7 +390,7 @@ function endGame() {
   overStreak.textContent = `${state.bestStreak}`;
   overNewBest.classList.toggle('hidden', !isNewBest);
 
-  const scores = getLocalScores(state.difficulty, state.timeMode);
+  const scores = await fetchScores(state.difficulty, state.timeMode);
   renderLbEntries(overLbList, scores, entry);
   showScreen(screenOver);
 }
@@ -385,4 +433,6 @@ diffBtns.forEach(btn => {
   btn.addEventListener('click', () => selectDifficulty(btn.dataset.diff as Difficulty));
 });
 
-selectDifficulty('easy');
+checkApi().then(() => {
+  selectDifficulty('easy');
+});

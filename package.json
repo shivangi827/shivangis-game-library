@@ -9,9 +9,8 @@
     "build:never-have-i-ever": "esbuild src/games/never-have-i-ever/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/never-have-i-ever/app.js",
     "build:zombie-survival": "esbuild src/games/zombie-survival/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/zombie-survival/app.js",
     "build:word-scramble": "esbuild src/games/word-scramble/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/word-scramble/app.js",
-    "build:bounty-of-the-lost": "esbuild src/games/bounty-of-the-lost/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/bounty-of-the-lost/app.js",
     "build:codecrack": "esbuild src/games/codecrack/client/app.ts --bundle --minify --sourcemap --target=es2020 --outfile=public/codecrack/app.js",
-    "build:clients": "npm run build:imposter && npm run build:vibe-check && npm run build:never-have-i-ever && npm run build:zombie-survival && npm run build:word-scramble && npm run build:bounty-of-the-lost && npm run build:codecrack",
+    "build:clients": "npm run build:imposter && npm run build:vibe-check && npm run build:never-have-i-ever && npm run build:zombie-survival && npm run build:word-scramble && npm run build:codecrack",
     "build": "npm run build:server && npm run build:clients",
     "start": "node dist/server.js",
     "dev": "concurrently \"tsc -p tsconfig.server.json --watch\" \"npm run build:imposter -- --watch\" \"npm run build:vibe-check -- --watch\" \"npm run build:never-have-i-ever -- --watch\" \"nodemon dist/server.js\""
